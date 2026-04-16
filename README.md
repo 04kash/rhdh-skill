@@ -14,7 +14,7 @@ claude plugin install --scope project rhdh
 ### From Published Plugin
 
 ```bash
-claude plugin marketplace add durandom/rhdh-skill
+claude plugin marketplace add redhat-developer/rhdh-skill
 claude plugin install --scope project rhdh
 ```
 
@@ -32,14 +32,19 @@ If `needs_setup: true`, follow the setup instructions to configure required repo
 
 ## Architecture
 
-The skill is split into two focused components:
+The plugin consists of an orchestrator skill that routes to specialized workflow skills:
 
 | Skill | Purpose | Contents |
 |-------|---------|----------|
 | `rhdh` | Orchestrator | Python CLI + routing logic |
-| `overlay` | Workflows | Markdown-only workflow definitions |
+| `overlay` | Overlay workflows | Onboard, update, fix, triage plugins |
+| `create-backend-plugin` | Backend plugins | Bootstrap new backend dynamic plugins |
+| `create-frontend-plugin` | Frontend plugins | Bootstrap new frontend dynamic plugins |
+| `export-and-package` | Packaging | Export plugins as OCI/tgz/npm |
+| `generate-frontend-wiring` | Frontend wiring | Mount points, routes, entity tabs |
+| `rhdh-local` | Local testing | Enable/disable/test plugins locally |
 
-This separation allows the orchestrator to be portable (stdlib-only Python) while keeping workflow documentation easy to maintain.
+The orchestrator is portable (stdlib-only Python) while workflow skills are markdown-only for easy maintenance.
 
 ## The RHDH CLI
 
@@ -78,7 +83,9 @@ This redirects `worklog.jsonl` and `TODO.md` to the specified directory.
 ./skills/rhdh/scripts/rhdh              # Status / orientation
 ./skills/rhdh/scripts/rhdh doctor       # Full environment check
 ./skills/rhdh/scripts/rhdh config init  # Create config with auto-detection
+./skills/rhdh/scripts/rhdh setup        # Environment setup commands
 ./skills/rhdh/scripts/rhdh workspace list  # List plugin workspaces
+./skills/rhdh/scripts/rhdh local        # Local RHDH customization operations
 
 # Activity tracking
 ./skills/rhdh/scripts/rhdh log add "Started onboard" --tag onboard
@@ -89,27 +96,37 @@ This redirects `worklog.jsonl` and `TODO.md` to the specified directory.
 
 | Command | Description |
 |---------|-------------|
-| `/rhdh` | Show status and route to appropriate workflow |
+| `/rhdh` | Show status and route to appropriate workflow (skill) |
 | `/onboard-plugin` | Add a new plugin to Extensions Catalog |
 | `/update-plugin` | Bump plugin to newer upstream version |
 | `/fix-plugin-build` | Debug CI/publish failures |
+| `/plugin-status` | Check plugin health and compatibility status |
 | `/triage-overlay-prs` | Prioritize open PRs (Core Team) |
 | `/analyze-overlay-pr` | Analyze specific PR (Core Team) |
+| `/session-log` | Document session accomplishments to logs |
 
 ## Project Structure
 
 ```
 rhdh-skill/
+├── .claude-plugin/        # Plugin manifest + marketplace listing
+├── commands/              # Slash command definitions
 ├── skills/
 │   ├── rhdh/              # Orchestrator skill
 │   │   ├── rhdh/          # Python CLI package (stdlib only)
 │   │   ├── scripts/rhdh   # Entry point
-│   │   ├── references/    # GitHub, JIRA tool guides
+│   │   ├── references/    # GitHub, JIRA, version refs
 │   │   └── SKILL.md       # Routing logic
-│   └── overlay/           # Workflow skill (markdown only)
-│       ├── workflows/     # onboard, update, fix, triage
-│       ├── references/    # Overlay-specific docs
-│       └── SKILL.md       # Workflow definitions
+│   ├── overlay/           # Overlay workflow skill
+│   │   ├── workflows/     # onboard, update, fix, triage
+│   │   ├── templates/     # Workspace file templates
+│   │   ├── references/    # Overlay-specific docs
+│   │   └── SKILL.md       # Workflow definitions
+│   ├── create-backend-plugin/
+│   ├── create-frontend-plugin/
+│   ├── export-and-package/
+│   ├── generate-frontend-wiring/
+│   └── rhdh-local/        # Local RHDH testing
 ├── tests/                 # pytest test suite
 └── pyproject.toml         # Dev dependencies
 ```
