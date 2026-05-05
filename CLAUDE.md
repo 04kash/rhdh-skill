@@ -1,80 +1,64 @@
 # CLAUDE.md
 
-## Development Rules
+Agent skills for Red Hat Developer Hub (RHDH) plugin development, overlay management, and local testing. Orchestrator skill (`rhdh`) routes to specialized sub-skills (`overlay`, `rhdh-local`, `create-*`). Skills follow the [Agent Skills open standard](https://agentskills.io/specification). See `CONTEXT.md` for domain language and `docs/adr/` for architectural decisions.
 
-1. **TDD First** — Write tests before implementation, even for markdown files. See `tests/unit/test_skill_structure.py` for examples.
+## 1. Think Before Coding
 
-2. **Run Tests** — `uv run pytest` before committing.
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
 
-## Project Structure
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them — don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
 
-```
-rhdh-skill/
-├── commands/                    # Slash commands for Claude Code
-├── skills/
-│   ├── rhdh/                    # Orchestrator skill (Python CLI + routing)
-│   │   ├── rhdh/                # Python CLI package (stdlib only)
-│   │   ├── scripts/             # Entry point (./scripts/rhdh)
-│   │   ├── references/          # Tool refs (GitHub, JIRA, repos, versions)
-│   │   └── SKILL.md             # Main intake + routing to sub-skills
-│   ├── overlay/                 # Overlay skill (markdown only)
-│   │   ├── workflows/           # Plugin workflows (onboard, update, fix, triage)
-│   │   ├── references/          # Overlay-specific refs (CI, labels, metadata)
-│   │   ├── templates/           # Workspace file templates
-│   │   └── SKILL.md             # Overlay workflow routing
-│   ├── rhdh-local/              # Local testing skill (Python CLI + workflows)
-│   │   ├── rhdh_local/          # Python CLI package (compose, health, sync)
-│   │   ├── scripts/             # Entry point (./scripts/rhdh-local)
-│   │   ├── workflows/           # Local workflows (enable, disable, test, switch)
-│   │   ├── references/          # Customization, env, troubleshooting refs
-│   │   └── SKILL.md             # Local testing intake
-│   ├── create-backend-plugin/   # Bootstrap backend dynamic plugins
-│   ├── create-frontend-plugin/  # Bootstrap frontend dynamic plugins
-│   ├── export-and-package/      # Export & package as OCI/tgz/npm
-│   └── generate-frontend-wiring/ # Configure mount points, routes, tabs
-├── .claude-plugin/              # Plugin manifest + marketplace listing
-├── .planning/                   # Planning docs for future features
-├── tests/                       # pytest test suite (dev only)
-└── pyproject.toml               # Dev dependencies (pytest, ruff)
-```
+## 2. Simplicity First
 
-## CLIs
+**Minimum code that solves the problem. Nothing speculative.**
 
-Two stdlib-only Python CLIs (Python 3.9+), auto-detecting output format (**TTY** → human-readable, **Piped** → JSON):
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- If you write 200 lines and it could be 50, rewrite it.
 
-### `rhdh` — Orchestrator CLI
+CLIs in this project use stdlib-only Python (see `docs/adr/0002-stdlib-only-python-clis.md`). Don't introduce dependencies.
 
-```bash
-./skills/rhdh/scripts/rhdh                   # Status (orientation)
-./skills/rhdh/scripts/rhdh doctor            # Full environment check
-./skills/rhdh/scripts/rhdh config init       # Create config with auto-detection
-./skills/rhdh/scripts/rhdh config show       # Show resolved paths
-./skills/rhdh/scripts/rhdh config set <k> <v> # Set config value
-./skills/rhdh/scripts/rhdh setup submodule list  # List available repos
-./skills/rhdh/scripts/rhdh setup submodule add --all  # Add all required repos
-./skills/rhdh/scripts/rhdh workspace list    # List plugin workspaces
-./skills/rhdh/scripts/rhdh workspace status <name>
-./skills/rhdh/scripts/rhdh log add "msg" --tag x  # Activity worklog
-./skills/rhdh/scripts/rhdh log show / search
-./skills/rhdh/scripts/rhdh todo add / list / done / note / show
-./skills/rhdh/scripts/rhdh local up / down / status / apply / health  # Delegates to rhdh-local
-```
+## 3. Surgical Changes
 
-### `rhdh-local` — Local Testing CLI
+**Touch only what you must. Clean up only your own mess.**
 
-```bash
-./skills/rhdh-local/scripts/rhdh-local       # Standalone local testing CLI
-```
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it — don't delete it.
 
-Both CLIs follow [agentic CLI design patterns](https://github.com/durandom/dotfiles/blob/main/skills/recipes/references/agentic-cli.md) (`/recipes agentic-cli`).
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
 
-## Key Patterns
+The test: every changed line should trace directly to what was asked.
 
-- `OutputFormatter` handles JSON/human rendering — commands build data dicts
-- Workflows live in `skills/overlay/workflows/` and `skills/rhdh-local/workflows/`
-- Config discovery: env vars → project config → user config → auto-detection
-- `commands/` dir provides slash commands that Claude Code auto-discovers
-- `rhdh` CLI delegates `local` subcommands to `rhdh_local.cli` module
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+Run `uv run pytest` before reporting any task complete. Do not report completion based on code existing — verify it works.
+
+## 5. No Irreversible Commands Without Confirmation
+
+Never force push, reset HEAD, merge branches, or run destructive commands without asking. If unsure whether a command is destructive, ask.
+
+## 6. Learn From Corrections
+
+If told an implementation was wrong, apply the correction and then record what went wrong so the same mistake is not repeated. Patterns and gotchas specific to this project belong in the relevant `references/` file under each skill.
+
+---
 
 ## Versioning
 
