@@ -11,7 +11,7 @@
     {
       "name": "rhdh",
       "source": "./",
-      "description": "Skills and commands for RHDH plugin lifecycle management",
+      "description": "Skills for RHDH plugin lifecycle management",
       "version": "0.2.0",
       "strict": true
     }

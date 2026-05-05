@@ -1,10 +1,8 @@
 """Tests for marketplace configuration files."""
 
 import json
-import re
 
 import pytest
-import yaml
 
 
 class TestPluginJson:
@@ -81,76 +79,3 @@ class TestMarketplaceJson:
             assert "name" in plugin
             assert "source" in plugin
             assert "version" in plugin
-
-
-class TestCommandFiles:
-    """Test command files have proper structure."""
-
-    @pytest.fixture
-    def command_files(self, skill_root):
-        """Get all command files."""
-        commands_dir = skill_root / "commands"
-        return list(commands_dir.glob("*.md"))
-
-    def test_commands_exist(self, command_files):
-        """At least one command should exist."""
-        assert len(command_files) >= 1
-
-    def test_command_has_frontmatter(self, command_files):
-        """Each command should have YAML frontmatter."""
-        for cmd in command_files:
-            content = cmd.read_text()
-            match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
-            assert match, f"{cmd.name} missing YAML frontmatter"
-
-            frontmatter = yaml.safe_load(match.group(1))
-            assert "description" in frontmatter, f"{cmd.name} missing description"
-
-    def test_command_has_allowed_tools(self, command_files):
-        """Each command should specify allowed-tools."""
-        for cmd in command_files:
-            content = cmd.read_text()
-            match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
-            assert match, f"{cmd.name} missing YAML frontmatter"
-            frontmatter = yaml.safe_load(match.group(1))
-
-            assert "allowed-tools" in frontmatter, f"{cmd.name} missing allowed-tools"
-            # Should reference the skill
-            assert "Skill" in frontmatter["allowed-tools"], (
-                f"{cmd.name} allowed-tools should reference Skill"
-            )
-
-
-class TestSettingsJson:
-    """Test .claude/settings.json structure."""
-
-    @pytest.fixture
-    def settings_json(self, skill_root):
-        """Load settings.json content."""
-        path = skill_root / ".claude" / "settings.json"
-        return json.loads(path.read_text())
-
-    def test_has_commands(self, settings_json):
-        """settings.json should have commands section."""
-        assert "commands" in settings_json
-        assert len(settings_json["commands"]) >= 1
-
-    def test_has_skills(self, settings_json):
-        """settings.json should have skills section."""
-        assert "skills" in settings_json
-        assert "rhdh" in settings_json["skills"]
-
-    def test_skill_has_path(self, settings_json):
-        """Skill entry should have path."""
-        skill = settings_json["skills"]["rhdh"]
-        assert "path" in skill
-
-    def test_command_paths_are_valid(self, settings_json, skill_root):
-        """Command paths should resolve to existing files."""
-        claude_dir = skill_root / ".claude"
-
-        for name, cmd in settings_json["commands"].items():
-            if "path" in cmd:
-                # Resolve relative path from .claude/
-                cmd_path = (claude_dir / cmd["path"]).resolve()
-                assert cmd_path.exists(), f"Command {name} path does not exist: {cmd_path}"

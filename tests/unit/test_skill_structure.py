@@ -13,7 +13,7 @@ class TestOrchestratorSkillMd:
     def skill_md(self, skills_dir):
         """Load orchestrator SKILL.md content."""
         skill_path = skills_dir / "SKILL.md"
-        return skill_path.read_text()
+        return skill_path.read_text(encoding="utf-8")
 
     @pytest.fixture
     def skill_frontmatter(self, skill_md):
@@ -81,7 +81,7 @@ class TestOverlaySkillMd:
     def skill_md(self, overlay_skill_dir):
         """Load overlay SKILL.md content."""
         skill_path = overlay_skill_dir / "SKILL.md"
-        return skill_path.read_text()
+        return skill_path.read_text(encoding="utf-8")
 
     @pytest.fixture
     def skill_frontmatter(self, skill_md):
@@ -181,7 +181,7 @@ class TestWorkflowStructure:
     def test_workflow_has_required_reading(self, workflow_files):
         """Each workflow should have <required_reading> section."""
         for workflow in workflow_files:
-            content = workflow.read_text()
+            content = workflow.read_text(encoding="utf-8")
             assert "<required_reading>" in content or "<prerequisites>" in content, (
                 f"{workflow.name} missing required_reading or prerequisites"
             )
@@ -189,14 +189,14 @@ class TestWorkflowStructure:
     def test_workflow_has_process(self, workflow_files):
         """Each workflow should have <process> section."""
         for workflow in workflow_files:
-            content = workflow.read_text()
+            content = workflow.read_text(encoding="utf-8")
             assert "<process>" in content, f"{workflow.name} missing <process> section"
             assert "</process>" in content, f"{workflow.name} missing </process> closing tag"
 
     def test_workflow_has_success_criteria(self, workflow_files):
         """Each workflow should have <success_criteria> section."""
         for workflow in workflow_files:
-            content = workflow.read_text()
+            content = workflow.read_text(encoding="utf-8")
             assert "<success_criteria>" in content, (
                 f"{workflow.name} missing <success_criteria> section"
             )
@@ -210,7 +210,7 @@ class TestRhdhReposReference:
         """Load rhdh-repos.md content."""
         path = skills_dir / "references" / "rhdh-repos.md"
         assert path.exists(), "rhdh-repos.md must exist in skills/rhdh/references/"
-        return path.read_text()
+        return path.read_text(encoding="utf-8")
 
     def test_rhdh_repos_exists(self, skills_dir):
         """rhdh-repos.md must exist."""
@@ -268,7 +268,7 @@ class TestReferenceStructure:
         for ref in reference_files:
             if ref.name in xml_optional:
                 continue
-            content = ref.read_text()
+            content = ref.read_text(encoding="utf-8")
             # Should have at least one XML tag
             has_xml = bool(re.search(r"<\w+>", content))
             assert has_xml, f"{ref.name} should use XML tags for structure"
@@ -290,5 +290,5 @@ class TestTemplateStructure:
     def test_template_has_code_blocks(self, template_files):
         """Templates should contain code block examples."""
         for template in template_files:
-            content = template.read_text()
+            content = template.read_text(encoding="utf-8")
             assert "```" in content, f"{template.name} should have code block examples"
