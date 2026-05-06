@@ -14,7 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       min-version: ${{ steps.resolve.outputs.min }}
-      max-version: ${{ steps.resolve.outputs.max }}
       matrix: ${{ steps.resolve.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
@@ -27,16 +26,8 @@ jobs:
               m = re.search(r'requires-python\s*=\s*\">=(\d+\.\d+)\"', f.read())
               print(m.group(1) if m else '3.9')
           ")
-          # Latest stable CPython minor version
-          MAX=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
-          if [ "$MIN" = "$MAX" ]; then
-            MATRIX="[\"$MIN\"]"
-          else
-            MATRIX="[\"$MIN\", \"$MAX\"]"
-          fi
           echo "min=$MIN" >> "$GITHUB_OUTPUT"
-          echo "max=$MAX" >> "$GITHUB_OUTPUT"
-          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+          echo "matrix=[\"$MIN\", \"3.x\"]" >> "$GITHUB_OUTPUT"
 
   lint:
     needs: resolve-python
@@ -50,7 +41,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ needs.resolve-python.outputs.max-version }}
+          python-version: "3.x"
 
       - run: uv sync --frozen --extra dev
 
