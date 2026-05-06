@@ -1,11 +1,13 @@
 ---
 name: skill-maker
-description: Create new agent skills following the Agent Skills open standard (agentskills.io). Interviews the user relentlessly about intent, scope, and edge cases before drafting. Covers SKILL.md structure, frontmatter, progressive disclosure, description optimization, script bundling, sub-command architecture, setup gates, context systems, and review. Use when the user wants to create a skill, write a skill, build a new skill, make a skill, draft a SKILL.md, or mentions "skill-maker". Also use when asked to package expertise, workflows, or domain knowledge into a reusable skill.
+description: Create new agent skills or consolidate existing skills following the Agent Skills open standard (agentskills.io). Interviews the user relentlessly about intent, scope, and edge cases before drafting. Covers SKILL.md structure, frontmatter, progressive disclosure, description optimization, script bundling, sub-command architecture, setup gates, context systems, and review. Use when the user wants to create a skill, write a skill, build a new skill, make a skill, draft a SKILL.md, or mentions "skill-maker". Also use when asked to package expertise, workflows, or domain knowledge into a reusable skill. Also use when asked to consolidate skills, merge skills, combine skills, reduce skill count, or refactor multiple skills into one.
 ---
 
-# Create Skill
+# Create or Consolidate Skills
 
 Create agent skills following the [Agent Skills open standard](https://agentskills.io/specification).
+
+**If consolidating existing skills** (merging multiple skills into fewer), read `references/consolidation-guide.md` and follow its workflow instead of the phases below. Return to Phase 5 (Review) for the final checklist.
 
 ## Phase 1: Interview
 
@@ -36,6 +38,8 @@ Focus areas, roughly in order:
     - **Does behavior vary by task type?** If so, design a register/mode system that classifies the task first, then loads different references.
 
 Read `references/architecture-patterns.md` when the skill needs sub-commands, context systems, or setup gates.
+
+**Consolidation signal check:** If the interview reveals the new skill overlaps significantly with existing skills (shared scripts, cross-references, linear pipeline), consider consolidating instead of creating. Read `references/consolidation-guide.md` for the signals and workflow.
 
 Do not proceed to Phase 2 until the user confirms the scope is complete.
 
@@ -268,6 +272,16 @@ Before presenting the final skill, verify against this checklist:
 - [ ] API schema discovery is documented (OpenAPI download, GraphQL introspection, or live endpoints)
 - [ ] API examples have been validated against the live endpoint
 - [ ] Instance-specific values include programmatic discovery methods
+
+### Consolidation (if merging existing skills)
+- [ ] No references to old skill names anywhere in the project (`grep -rn` the entire repo)
+- [ ] Router intake menus are sequentially numbered (no gaps from removed items)
+- [ ] Script docstrings and `--help` text reference the new skill name, not the old ones
+- [ ] Reference paths resolve correctly from each file's location (no `references/references/` nesting)
+- [ ] All example files from old skills are represented in the consolidated examples
+- [ ] Scripts in the same skill use consistent patterns (NO_COLOR, shell flags, TTY checks, exit codes)
+- [ ] README, ADRs, and other docs updated to reflect new skill structure
+- [ ] New description covers all trigger phrases from all old skills' descriptions
 
 ### Quality
 - [ ] No time-sensitive information (URLs to specific versions, dates that will go stale)

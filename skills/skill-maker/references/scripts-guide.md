@@ -47,6 +47,10 @@ Skills run on macOS, Windows, and Linux. Write scripts that work on all three:
 - **Path separators**: Use `pathlib.Path` or `os.path.join()`, never hardcode `/` in paths.
 - **Line endings**: Use `newline=""` when opening files for CSV/structured output. Don't assume `\n`.
 - **Shell commands**: If a script calls external tools, document the platform differences or use Python stdlib equivalents.
+- **subprocess on Windows**: Tools installed via npm/yarn (e.g., `npx`, `yarn`) are `.cmd` shims on Windows. Use `shell=True` conditionally:
+  ```python
+  subprocess.run(cmd, shell=(sys.platform == "win32"))
+  ```
 
 ```python
 import tempfile
@@ -121,6 +125,25 @@ Run with: `uv run scripts/extract.py`
 ## Designing for Agents
 
 Scripts invoked by agents should follow these patterns:
+
+### Respect NO_COLOR
+
+Honor the [NO_COLOR](https://no-color.org/) standard. Check both TTY status and the environment variable:
+
+```python
+import os
+import sys
+
+_no_color = os.environ.get("NO_COLOR") is not None
+_is_tty = sys.stdout.isatty() and not _no_color
+```
+
+**Gotcha: check the right stream.** If the script logs to `stderr` (common when `--json` output goes to `stdout`), check `sys.stderr.isatty()` — not `sys.stdout.isatty()`. Otherwise ANSI codes get disabled for terminal stderr output when stdout is piped.
+
+```python
+# Script logs to stderr, JSON to stdout
+_is_tty = sys.stderr.isatty() and not _no_color
+```
 
 ### Structured output
 
