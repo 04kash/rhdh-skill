@@ -272,7 +272,8 @@ These are non-controversial changes applied without individual prompts:
 - Setting Story Points — needs estimation
 - Linking to parent Feature/Epic — needs selection from candidates
 - Marking as duplicate — destructive, needs confirmation
-- Closing stale issues — needs relevance confirmation
+- Closing stale issues — needs relevance confirmation. When closing, **always** add a comment documenting the rationale (e.g., "Closing as stale — no activity for 90 days, no longer on the roadmap") and set the resolution field (e.g., `Won't Do`, `Duplicate`, `Done`). This preserves the decision trail for future reference.
+- Marking as duplicate — same rule: add a comment linking to the original issue and set resolution to `Duplicate`
 
 For writes, follow the API preference order from SKILL.md. Since refinement uses GraphQL reads (AUTH is already set), prefer REST for writes.
 
