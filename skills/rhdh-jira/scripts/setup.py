@@ -114,9 +114,12 @@ def check_token_file(acli_path):
         # Check file permissions on Unix
         if sys.platform != "win32":
             import stat
+
             mode = token_path.stat().st_mode
             if mode & (stat.S_IRGRP | stat.S_IROTH):
-                warnings.append("file is readable by group/others — run: chmod 600 " + str(token_path))
+                warnings.append(
+                    "file is readable by group/others — run: chmod 600 " + str(token_path)
+                )
         return str(token_path), "valid", warnings
     except OSError as e:
         return None, f"read error: {e}", warnings
@@ -229,7 +232,7 @@ def _output(results, as_json):
         for w in results.get("token_file_warnings", []):
             print(f"  [WARN] {w}")
     else:
-        acli_dir = Path(results['acli_path']).resolve().parent
+        acli_dir = Path(results["acli_path"]).resolve().parent
         print("  [WARN] No .jira-token file found next to acli")
         print(f"         Expected at: {acli_dir / '.jira-token'}")
         print("         Create with: echo 'email:api-token' > .jira-token")
