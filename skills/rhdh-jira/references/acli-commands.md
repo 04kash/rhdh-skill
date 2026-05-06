@@ -195,6 +195,14 @@ acli jira sprint list-workitems --sprint 65456 --board 11374
 acli jira sprint create --name "RHDH COPE 3292" --board 11374
 ```
 
+**Sprint JSON gotcha:** `list-workitems --json` returns `{"issues": [...], "maxResults": N, ...}` — NOT a flat array. Extract the `issues` array before piping to `parse_issues.py`:
+
+```bash
+acli jira sprint list-workitems --sprint 65456 --board 11374 --json | python -c "
+import json, sys; json.dump(json.load(sys.stdin)['issues'], sys.stdout)
+" | python scripts/parse_issues.py --enrich -s key,summary,status,story_points
+```
+
 ## Projects
 
 ```bash
@@ -231,3 +239,13 @@ acli jira filter get --id 10001
 | Fix versions | Not available via `--fields` | Array of version objects |
 
 When writing descriptions, use `--description "plain text"`. When reading, be aware `--json` returns ADF — don't try to round-trip it.
+
+## Custom Fields and `--enrich`
+
+**Critical:** Both `search --json` and `view KEY --json` (without `--fields "*all"`) return only basic fields: assignee, issuetype, priority, status, summary. Custom fields (story_points, team, sprint, size) are NOT included.
+
+To get custom fields, you MUST either:
+1. Use `view KEY --fields "*all" --json` (what `--enrich` does internally per issue), or
+2. Use `parse_issues.py --enrich` (recommended — handles batching and flattening)
+
+Without `--enrich`, custom fields appear as empty strings — making it look like data isn't set when it is. This is the #1 source of false "missing data" reports.

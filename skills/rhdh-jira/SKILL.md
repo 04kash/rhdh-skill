@@ -74,6 +74,8 @@ Load only what the current task requires.
 5. **Team field is NOT JQL-filterable.** `customfield_10001` cannot be used in JQL WHERE clauses. Fetch all issues, filter by `customfield_10001.name` in post-processing.
 6. **ADF vs plain text.** Reading descriptions via `--json` returns Atlassian Document Format (nested JSON). Creating/editing with `--description` accepts plain text. Don't try to round-trip ADF through `--description`.
 7. **Acceptance Criteria field is almost always null.** Scan the description for "Requirements", "Acceptance Criteria", or bullet-style criteria instead of checking `customfield_10718`.
+8. **`--enrich` is MANDATORY for custom fields.** Both `acli search --json` and `acli view KEY --json` (without `--fields "*all"`) return only basic fields (assignee, issuetype, priority, status, summary). Story points, team, sprint, and size will appear as empty/null — looking like the data isn't set when it actually is. Always use `scripts/parse_issues.py --enrich` to get custom field data. Skipping `--enrich` is the #1 cause of false "missing data" reports.
+9. **`acli sprint list-workitems --json` wraps results in `{"issues": [...]}`.** The output is NOT a flat array — it's an object with an `issues` key. Extract the array before piping to `parse_issues.py`. See `references/acli-commands.md` for the workaround command.
 
 ## Error Handling
 
