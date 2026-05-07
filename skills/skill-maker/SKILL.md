@@ -1,13 +1,79 @@
 ---
 name: skill-maker
-description: Create new agent skills or consolidate existing skills following the Agent Skills open standard (agentskills.io). Interviews the user relentlessly about intent, scope, and edge cases before drafting. Covers SKILL.md structure, frontmatter, progressive disclosure, description optimization, script bundling, sub-command architecture, setup gates, context systems, and review. Use when the user wants to create a skill, write a skill, build a new skill, make a skill, draft a SKILL.md, or mentions "skill-maker". Also use when asked to package expertise, workflows, or domain knowledge into a reusable skill. Also use when asked to consolidate skills, merge skills, combine skills, reduce skill count, or refactor multiple skills into one.
+description: Create, audit, or consolidate agent skills following the Agent Skills open standard (agentskills.io). Interviews the user relentlessly about intent, scope, and edge cases before drafting. Covers SKILL.md structure, frontmatter, progressive disclosure, description optimization, script bundling, sub-command architecture, setup gates, context systems, and review. Use when the user wants to create a skill, write a skill, build a new skill, make a skill, draft a SKILL.md, or mentions "skill-maker". Also use when asked to review a skill, audit a SKILL.md, check why a skill never triggers, improve an existing skill, or fix a skill. Also use when asked to package expertise, workflows, or domain knowledge into a reusable skill. Also use when asked to consolidate skills, merge skills, combine skills, reduce skill count, or refactor multiple skills into one.
 ---
 
-# Create or Consolidate Skills
+# Create, Audit, or Consolidate Skills
 
 Create agent skills following the [Agent Skills open standard](https://agentskills.io/specification).
 
+**If auditing an existing skill**, follow the Audit Workflow below instead of the creation phases.
+
 **If consolidating existing skills** (merging multiple skills into fewer), read `references/consolidation-guide.md` and follow its workflow instead of the phases below. Return to Phase 5 (Review) for the final checklist.
+
+## Audit Workflow
+
+Use this workflow when reviewing, improving, or debugging an existing skill.
+
+### Step 1: Locate and read the skill
+
+Read the full SKILL.md and list all files in the skill directory (`references/`, `scripts/`, `templates/`, `assets/`).
+
+### Step 2: Run the audit checklist
+
+Check each category. Note issues as you go.
+
+**Frontmatter:**
+
+- [ ] `name` matches the directory name, lowercase+hyphens, max 64 chars
+- [ ] `description` is under 1024 chars, non-empty, third person
+- [ ] `description` includes trigger phrases (not just a summary of what the skill does)
+- [ ] `description` covers edge phrasings users would actually say
+
+**Structure:**
+
+- [ ] SKILL.md body is under 500 lines
+- [ ] Essential principles are inline in SKILL.md (not only in a reference file)
+- [ ] All referenced files exist (check every path in the SKILL.md)
+- [ ] References are one level deep (no nested chains: A → B → C)
+
+**Content quality:**
+
+- [ ] No rigid ALWAYS/NEVER rules without reasoning (explain WHY)
+- [ ] No explanations of things the agent already knows from training
+- [ ] Steps are specific and verifiable (not "handle errors appropriately")
+- [ ] Success criteria are observable and testable
+- [ ] Examples use fake data where appropriate
+
+**Router pattern** (if applicable):
+
+- [ ] Intake question asks what the user wants before routing
+- [ ] Router table maps commands to reference files
+- [ ] All referenced workflow/reference files exist
+- [ ] Essential principles are in SKILL.md, not only in sub-command references
+
+**Scripts** (if present):
+
+- [ ] Scripts have shebangs, `--help`, and structured output
+- [ ] No interactive prompts (all input via flags/env/stdin)
+- [ ] Cross-platform paths (pathlib, no hardcoded separators)
+- [ ] Error messages explain what went wrong and what to do
+
+Read `references/anti-patterns.md` for the full catalog of common failures.
+
+### Step 3: Generate the report
+
+Present findings grouped by severity:
+
+1. **Critical** — skill won't trigger or produces wrong output
+2. **Important** — structural issues, missing files, spec violations
+3. **Minor** — style, conciseness, optimization opportunities
+
+For each finding, state the issue, cite the specific line or section, and recommend a fix.
+
+### Step 4: Offer fixes
+
+Ask the user which findings to fix. Apply changes surgically — don't rewrite sections that aren't broken. Run the Phase 5 review checklist on the modified skill before finishing.
 
 ## Phase 1: Interview
 
@@ -31,13 +97,40 @@ Focus areas, roughly in order:
 8. **Existing patterns.** Similar skills or workflows to draw from? Check the codebase.
 9. **Platform constraints.** macOS, Windows, and Linux? Scripts must handle path separators, temp directories, and shell differences.
 10. **External services and APIs.** Does the skill call external APIs or services? If yes, read `references/api-skill-patterns.md` — it covers credential handling, schema discovery, instance-specific values, and error placement.
-11. **Architecture.** Based on the answers above, decide whether the skill's scope warrants sub-commands, context systems, or setup gates. Most skills don't need this — skip to Phase 2 if the skill is straightforward. If it does, ask:
-    - **Should this be one skill with sub-commands or multiple skills?** One skill with a router table prevents menu pollution. Multiple skills are appropriate when the tasks have no shared context or setup.
-    - **Does the skill need project-level context?** If every command needs the same background (project config, conventions), design a context file pattern with a loader script.
-    - **Are there mandatory setup gates?** Steps that must pass before any work begins (context loaded, config valid, dependencies present). Gates prevent generic output.
-    - **Does behavior vary by task type?** If so, design a register/mode system that classifies the task first, then loads different references.
 
-Read `references/architecture-patterns.md` when the skill needs sub-commands, context systems, or setup gates.
+### Architecture decision tree
+
+After the interview questions above, decide the architecture. Most skills are simple — only escalate when the answers demand it.
+
+**Question 1: How many distinct things can a user want to do?**
+
+- One specific thing → **Simple skill** (single SKILL.md, under 200 lines)
+- Multiple things with shared principles → continue to Q2
+
+**Question 2: Is there shared domain knowledge across those operations?**
+
+- No, each operation is self-contained → **Simple skill** (or multiple separate simple skills)
+- Yes, multiple operations share knowledge → **Router skill** (SKILL.md + `references/`)
+
+**Question 3: Does it cover a full lifecycle (build, debug, test, ship)?**
+
+- No → **Router skill** is sufficient
+- Yes → **Domain expertise skill** (exhaustive references, full lifecycle workflows)
+
+| What you're building | Pattern |
+|---|---|
+| "A skill that commits with a conventional message" | Simple |
+| "A skill that manages PRs — create, review, merge, close" | Router |
+| "A skill for building and shipping macOS apps" | Domain expertise |
+| "A skill that audits other skills" | Simple (upgrade to Router if it grows) |
+
+For Router and Domain expertise patterns, also ask:
+
+- **Does the skill need project-level context?** If every command needs the same background, design a context file pattern with a loader script.
+- **Are there mandatory setup gates?** Steps that must pass before any work begins. Gates prevent generic output.
+- **Does behavior vary by task type?** If so, design a register/mode system that classifies the task first, then loads different references.
+
+Read `references/architecture-patterns.md` for implementation details of each pattern.
 
 **Consolidation signal check:** If the interview reveals the new skill overlaps significantly with existing skills (shared scripts, cross-references, linear pipeline), consider consolidating instead of creating. Read `references/consolidation-guide.md` for the signals and workflow.
 
@@ -46,6 +139,8 @@ Do not proceed to Phase 2 until the user confirms the scope is complete.
 ## Phase 2: Draft the SKILL.md
 
 Write the skill following the spec. Read `references/spec-guide.md` for the full format reference before drafting.
+
+**Starter templates:** Use `templates/simple-skill.md` for single-purpose skills or `templates/router-skill.md` for multi-command skills. Copy the template as a starting point, then customize.
 
 ### Frontmatter
 
@@ -81,6 +176,8 @@ Common trap: a new sub-command reference duplicates tables from an existing refe
 ### Writing patterns
 
 - **Imperative form**: "Run the command" not "You should run the command"
+- **Explain WHY, not just what**: Avoid rigid ALWAYS/NEVER rules without reasoning. Agents generalize from principles better than from rigid rules. Instead of "ALWAYS use pdfplumber. NEVER use PyPDF2," write "Use pdfplumber over PyPDF2 — it handles malformed PDFs more gracefully and preserves layout metadata needed for table extraction." Principles adapt to edge cases; rigid rules break.
+- **Don't explain what the agent already knows**: Skip basic programming concepts, standard library usage, and well-known tool behavior. Only add context the agent doesn't have — project-specific conventions, non-obvious behavior, domain-specific gotchas. A 30-token code example beats a 150-token explanation of what a library is.
 - **Output templates**: Define exact formats when the output structure matters
 - **Concrete examples**: Show input → output for non-obvious workflows
 - **Gotchas sections**: Common mistakes the agent should avoid
@@ -89,9 +186,13 @@ Common trap: a new sub-command reference duplicates tables from an existing refe
 - **Absolute bans**: When certain patterns are always wrong, use match-and-refuse lists. "If you're about to write X, stop and do Y instead." More effective than vague "be careful" guidance.
 - **Avoid hardcoded thresholds**: Don't write arbitrary numbers as rules (e.g., "when you have 3+ sub-commands" or "if more than 5 issues") unless the threshold comes from a real constraint (API limit, spec requirement). Instead, describe the signal that triggers the behavior (e.g., "when you're copying the same text into another sub-command"). Hardcoded numbers feel authoritative but are usually guesses that don't generalize.
 
+Read `references/anti-patterns.md` during drafting to avoid known pitfalls.
+
 ### Sub-command router (when applicable)
 
-For skills with multiple distinct operations, use a router table in SKILL.md:
+For skills with multiple distinct operations, use a router table in SKILL.md.
+
+**Format choice:** Markdown headings work for most skills. For complex multi-agent orchestration or skills needing machine-parseable sections, XML tags (`<intake>`, `<routing>`, `<essential_principles>`) are also valid. You can mix them — XML tags for structural sections, markdown within content. Use whichever makes the skill easier to follow.
 
 ```markdown
 ## Commands
