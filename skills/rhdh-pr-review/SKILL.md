@@ -21,7 +21,7 @@ See `references/operator-pr-images.md` for extraction commands.
 
 <principle name="patch_not_redeploy">
 Swap images on a running deployment rather than redeploying from scratch.
-Use `oc set image` to patch the operator deployment in place — this is faster and preserves existing state (Backstage CRs, config, Keycloak).
+For non-OLM installs, use `oc set image`. For OLM-managed installs, patch the CSV — never patch the Deployment directly as OLM will overwrite it. This is faster and preserves existing state (Backstage CRs, config, Keycloak).
 </principle>
 
 </essential_principles>
