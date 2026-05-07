@@ -119,117 +119,12 @@ oc get backstage -A 2>/dev/null
 | Cluster accessible but no RHDH operator | Deploy RHDH on existing cluster (see 3.5b) |
 | No cluster access (`oc whoami` fails) | Provision a cluster via rhdh-test-instance PR (see 3.5a) |
 
-### 3.5a Provision a cluster via rhdh-test-instance PR (no cluster needed)
+### 3.5 Provision or deploy RHDH
 
-This uses the rhdh-test-instance PR workflow — Prow CI provisions an OpenShift cluster, deploys RHDH with Keycloak, and posts back the URL + credentials. No local clone required.
+Read `../references/cluster-provisioning.md` and follow the appropriate section:
 
-**Step 1: Find or create a PR on rhdh-test-instance**
-
-```bash
-TEST_INSTANCE_REPO="redhat-developer/rhdh-test-instance"
-
-# Check for an existing open PR you can use
-gh pr list --repo $TEST_INSTANCE_REPO --state open --limit 5
-```
-
-If no suitable PR exists, create one:
-
-```bash
-# Fork and create a no-op PR (e.g., update README or add a comment)
-gh repo fork $TEST_INSTANCE_REPO --clone=false
-gh pr create --repo $TEST_INSTANCE_REPO \
-  --title "test: PR review environment for rhdh-operator PR #$PR_NUMBER" \
-  --body "Temporary PR to provision a test cluster for reviewing rhdh-operator PR #$PR_NUMBER" \
-  --head <your-fork-branch>
-```
-
-**Step 2: Trigger deployment**
-
-```bash
-TEST_PR=<pr-number-on-rhdh-test-instance>
-
-gh pr comment $TEST_PR --repo $TEST_INSTANCE_REPO \
-  --body "/test deploy operator 1.9 4h"
-```
-
-**Step 3: Wait for Prow to post credentials**
-
-The Prow job takes several minutes. Monitor:
-
-- Prow status: https://prow.ci.openshift.org/?repo=redhat-developer%2Frhdh-test-instance&type=presubmit&job=pull-ci-redhat-developer-rhdh-test-instance-main-deploy
-
-Poll the PR for the bot's response:
-
-```bash
-# Check for deployment comment (contains RHDH URL and credentials)
-gh pr view $TEST_PR --repo $TEST_INSTANCE_REPO --json comments \
-  --jq '.comments[] | select(.body | test("RHDH URL|Deployed")) | .body' | tail -1
-```
-
-The bot response includes:
-- RHDH URL
-- OpenShift Console URL
-- Cluster credentials (from Vault)
-- Cluster availability window
-
-**Step 4: Log in to the provisioned cluster**
-
-```bash
-oc login <cluster-url-from-bot> -u <username> -p <password>
-```
-
-Verify access, then proceed to Phase 4.
-
-### 3.5b Deploy RHDH on an existing cluster (cluster accessible, no RHDH)
-
-If `oc whoami` works but no RHDH operator is running, deploy one using rhdh-test-instance locally.
-
-Locate the repo:
-
-```bash
-RHDH_TEST_INSTANCE=""
-for candidate in \
-  ../rhdh-test-instance \
-  ~/Documents/something-about-skills/rhdh-test-instance \
-  ~/src/rhdh/rhdh-test-instance \
-  ~/rhdh-test-instance; do
-  if [ -f "$candidate/Makefile" ] && [ -f "$candidate/deploy.sh" ]; then
-    RHDH_TEST_INSTANCE="$(cd "$candidate" && pwd)"
-    break
-  fi
-done
-echo "rhdh-test-instance: ${RHDH_TEST_INSTANCE:-NOT FOUND}"
-```
-
-If not found, clone it:
-
-```bash
-git clone https://github.com/redhat-developer/rhdh-test-instance.git
-RHDH_TEST_INSTANCE="$(pwd)/rhdh-test-instance"
-```
-
-Deploy:
-
-```bash
-cd $RHDH_TEST_INSTANCE
-
-# Configure secrets
-cp .env.example .env
-# Edit .env with Keycloak credentials if needed
-
-# Install operator (one-time, runs in container — needs podman)
-make install-operator VERSION=1.9
-
-# Deploy RHDH instance
-make deploy-operator VERSION=1.9
-```
-
-Wait for readiness:
-
-```bash
-oc get pods -n rhdh -w
-make url
-```
+- **No cluster at all** (`oc whoami` fails) → follow `<provision_via_pr>` to provision a cluster via rhdh-test-instance PR workflow
+- **Cluster accessible but no RHDH** → follow `<deploy_on_existing_cluster>` to deploy RHDH locally
 
 Once the operator and Backstage CR are healthy, proceed to Phase 4.
 

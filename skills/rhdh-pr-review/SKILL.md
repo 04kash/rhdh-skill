@@ -57,6 +57,7 @@ For non-OLM installs, use `oc set image`. For OLM-managed installs, patch the CS
 | Reference | Purpose | Path |
 |-----------|---------|------|
 | operator-pr-images | CI image naming, registry, extraction, expiry | `references/operator-pr-images.md` |
+| cluster-provisioning | Provision or deploy RHDH cluster for testing | `references/cluster-provisioning.md` |
 | github-reference | gh CLI patterns, PR queries | `../../rhdh/references/github-reference.md` |
 | rhdh-repos | RHDH ecosystem repository map | `../../rhdh/references/rhdh-repos.md` |
 
@@ -72,12 +73,6 @@ For non-OLM installs, use `oc set image`. For OLM-managed installs, patch the CS
 
 <success_criteria>
 
-PR review session is complete when:
-
-- [ ] PR images identified from CI comment and validated in registry
-- [ ] Cluster has RHDH operator running with the PR image
-- [ ] Review checklist generated from diff analysis
-- [ ] Rollback instructions documented
-- [ ] Activity logged via `$RHDH log add`
+See `workflows/review-operator-pr.md` `<success_criteria>` for the full checklist.
 
 </success_criteria>
