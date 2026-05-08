@@ -45,6 +45,10 @@ Track work across the four RHDH Jira projects.
   - **[sprint-report](./skills/rhdh-jira/references/sprint-report.md)** — Sprint review summary: committed vs completed, per-member breakdown, epic progress, demo checklist with naming conventions, and velocity trend.
   - **[release](./skills/rhdh-jira/references/release.md)** — Release readiness: feature matrix, Program Increment funnel, epic roll-up, cross-team dependency map, blocker bugs, release notes readiness, and risk assessment.
 
+### PR Review
+
+- **[rhdh-pr-review](./skills/rhdh-pr-review/SKILL.md)** — Test PR changes on a live RHDH cluster. Swaps CI images, verifies code changes, and reports findings.
+
 ### Orchestration
 
 - **[rhdh](./skills/rhdh/SKILL.md)** — Entry point and router. Detects your environment, runs `doctor` checks, maintains a cross-session worklog, and routes to the right skill. Start here if you're not sure what you need.
