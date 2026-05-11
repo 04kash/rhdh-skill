@@ -4,6 +4,18 @@ Use the Jira REST API when `acli` cannot update a custom field. This is a fallba
 
 Authentication setup: see `references/auth.md`. All examples below assume `AUTH` is set per that file.
 
+## JQL Search via REST
+
+The REST API v3 search endpoint (`/rest/api/3/search`) returns **HTTP 410 Gone** on the Red Hat Jira instance (both POST and GET). This is an Atlassian-side deprecation — do not attempt REST search as a fallback.
+
+**Search priority order:**
+
+1. `acli jira workitem search` (with `--limit 200` or `--paginate`)
+2. GraphQL `issueSearchStable` (beta, requires experimental header)
+3. REST search is **not available** on this instance
+
+REST remains valid for single-issue reads (`GET /rest/api/3/issue/{key}`) and field updates (`PUT /rest/api/3/issue/{key}`).
+
 ## Schema Discovery
 
 The REST API v3 has a published OpenAPI spec. Use it to discover endpoints, field formats, and payload shapes.

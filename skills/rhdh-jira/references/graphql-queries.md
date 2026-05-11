@@ -154,10 +154,10 @@ If you discover stable mutations in the future via introspection, verify they do
 ## Caveats
 
 1. **`issueSearchStable` is beta.** Requires `X-ExperimentalApi: JiraIssueSearch` header. May break without notice. If you get a `BetaHeaderOptInException` error, add this header.
-2. **Team field values on issues are limited.** `JiraTeamViewField` on issues exposes `selectedTeam.jiraSuppliedName` and `fullTeam.members` but not all sub-fields. For direct team roster lookup (without going through an issue), use `team.teamV2(id, siteId)` — see the Team Roster Query pattern below.
-3. **`cloudId` is required on every query.** Use `2b9e35e3-6bd3-4cec-b838-f4249ee02432` for redhat.atlassian.net. Discover it via `/_edge/tenant_info` (see Authentication section).
-4. **Rate limiting is cost-based.** 10,000 points per user per minute. HTTP 429 with `RETRY-AFTER` header when exceeded. Do not retry on 5xx.
-5. **Operation names are mandatory.** Every query must have a name (e.g., `query GetIssue { ... }`). Unnamed queries will be rejected in the future.
+2. **All queries MUST have an operation name.** Anonymous queries (`query { ... }`) are rejected with "An operation name must be provided to the query to augment observability." Always use named operations: `query MyQueryName { ... }`. This is enforced now, not "in the future."
+3. **Team field values on issues are limited.** `JiraTeamViewField` on issues exposes `selectedTeam.jiraSuppliedName` and `fullTeam.members` but not all sub-fields. For direct team roster lookup (without going through an issue), use `team.teamV2(id, siteId)` — see the Team Roster Query pattern below.
+4. **`cloudId` is required on every query.** Use `2b9e35e3-6bd3-4cec-b838-f4249ee02432` for redhat.atlassian.net. Discover it via `/_edge/tenant_info` (see Authentication section).
+5. **Rate limiting is cost-based.** 10,000 points per user per minute. HTTP 429 with `RETRY-AFTER` header when exceeded. Do not retry on 5xx.
 6. **No spec file to download.** Unlike REST (which has an OpenAPI spec), GraphQL schema is discovered via introspection queries only. Use `__type` or the full `__schema` query. See Schema Discovery section.
 
 ## Team Roster Query

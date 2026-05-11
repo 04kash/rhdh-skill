@@ -132,11 +132,12 @@ Load only what the current task requires.
 5. **Team field has two JQL syntaxes.** `customfield_10001` cannot be used in JQL WHERE clauses. However, `"Team[Team]" = {teamId}` (using the team UUID, not display name) works. Use the UUID syntax for JQL filtering; use `customfield_10001.name` in post-processing only when you need the display name from JSON output.
 6. **ADF vs plain text.** Reading descriptions via `--json` returns Atlassian Document Format (nested JSON). Creating/editing with `--description` accepts plain text. Don't try to round-trip ADF through `--description`.
 7. **Acceptance Criteria field is almost always null.** Scan the description for "Requirements", "Acceptance Criteria", or bullet-style criteria instead of checking `customfield_10718`.
-8. **`--enrich` is MANDATORY for custom fields.** Both `acli search --json` and `acli view KEY --json` (without `--fields "*all"`) return only basic fields (assignee, issuetype, priority, status, summary). Story points, team, sprint, and size will appear as empty/null — looking like the data isn't set when it actually is. Always use `scripts/parse_issues.py --enrich` to get custom field data. Skipping `--enrich` is the #1 cause of false "missing data" reports.
-9. **Custom fields may fail to update via `acli`.** `acli jira workitem edit` can silently fail or error when setting custom fields (Team, Size, Story Points). When an `acli edit` for a custom field fails, fall back to the Jira REST API. Find the token file at `.jira-token` next to the `acli` executable (discover the path with `readlink -f "$(which acli)"` or `where acli`). Read `references/rest-api-fallback.md` for curl examples and payload formats. Never read the token file into context.
+8. **`--enrich` is MANDATORY for custom fields AND labels.** Both `acli search --json` and `acli view KEY --json` (without `--fields "*all"`) return only basic fields (assignee, issuetype, priority, status, summary). Labels, story points, team, sprint, size, and components will all appear as empty/null — looking like the data isn't set when it actually is. Always use `scripts/parse_issues.py --enrich` to get custom field data. Skipping `--enrich` is the #1 cause of false "missing data" reports.
+9. **`acli` cannot set arbitrary custom fields.** `acli jira workitem edit` does not have a `--custom` flag. Fields like Team, Size, Story Points, and Release Note Type can only be updated via the Jira REST API. Use `PUT /rest/api/3/issue/{key}` with the field payload (see `references/rest-api-fallback.md` for curl examples and payload formats). Find the token file at `.jira-token` next to the `acli` executable (discover the path with `readlink -f "$(which acli)"` or `where acli`). Never read the token file into context.
 10. **`acli sprint list-workitems --json` wraps results in `{"issues": [...]}`.**  The output is NOT a flat array — it's an object with an `issues` key. Extract the array before piping to `parse_issues.py`. See `references/acli-commands.md` for the workaround command.
 11. **GraphQL search is beta.** `issueSearchStable` requires `X-ExperimentalApi: JiraIssueSearch` header. Load `references/graphql-queries.md` before attempting GraphQL queries.
 12. **`.jira-token` format is `email:token`, not bare token.** A file containing only the API token without the email prefix will cause 401 errors on REST/GraphQL calls. The `setup.py` script validates the format.
+13. **`acli search` silently truncates results.** The default page size is 30. If your JQL matches more than 30 issues, you get the first 30 with no warning. Always pass `--limit 200` for bulk queries, or use `--count` first to check the total, then `--paginate` to fetch all pages. This is the #2 cause of incorrect reports after skipping `--enrich`.
 
 ## Error Handling
 
@@ -150,7 +151,7 @@ Load only what the current task requires.
 | Rate limiting (429) | Wait 5 seconds, retry once. |
 | Interactive prompt hangs | Missing `--yes` flag on a mutating command. |
 | Custom field update fails via `acli` | Fall back to Jira REST API using `.jira-token` file. See Gotcha #9. |
-| `issueSearchStable` returns errors | Fall back to REST API search (`/rest/api/3/search`) with the same JQL. Warn that the beta API failed. |
+| `issueSearchStable` returns errors | Fall back to `acli` search (not REST — `/rest/api/3/search` returns 410 Gone on this instance). Warn that the beta API failed. |
 
 ## Team Conventions
 

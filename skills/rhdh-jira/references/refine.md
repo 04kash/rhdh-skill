@@ -6,6 +6,18 @@ Uses GraphQL for bulk reads (skip acli). Writes follow the API preference order 
 
 Authentication setup: see `references/auth.md`. All examples below assume `AUTH`, `CLOUD_ID`, and `GRAPHQL_URL` are set per that file.
 
+## Refinement Context
+
+Before generating the report, determine the refinement context. Ask or infer from conversation.
+
+| Context | Goal | Urgency framing |
+|---------|------|------------------|
+| **Pre-release prep** | Features are ready to start work when the release kicks off | "Ready for a clean start" |
+| **Mid-release hygiene** | In-flight features are on track, no blockers | "On track for delivery" |
+| **Feature freeze triage** | All features must be complete or descoped | "Must close or descope before freeze" |
+
+The context affects report tone, Slack messages, and which checks matter most. Pre-release prep cares about sizing + child epics + Refinement transition readiness. Freeze triage cares about completion + blockers + descope candidates.
+
 ## Input
 
 The caller provides one of:

@@ -14,18 +14,20 @@ Cheat sheet for `acli jira` commands. For full flag details, run `acli jira <sub
 
 ### Search
 
+> ⚠️ **Default page size is 30 results.** Results beyond 30 are silently dropped with no warning. Always pass `--limit 200` or `--paginate` for bulk queries. Use `--count` first to verify the total matches before fetching.
+
 ```bash
-# JQL search with field selection
-acli jira workitem search --jql "project = RHIDP AND status = 'In Progress'" --fields "key,summary,status,assignee" --limit 50
+# JQL search with field selection (always set --limit for bulk)
+acli jira workitem search --jql "project = RHIDP AND status = 'In Progress'" --fields "key,summary,status,assignee" --limit 200
 
 # JSON output for full field data
-acli jira workitem search --jql "project = RHIDP" --limit 20 --json
+acli jira workitem search --jql "project = RHIDP" --limit 200 --json
 
-# Count only
+# Count only (check total before fetching)
 acli jira workitem search --jql "project = RHDHBUGS AND status not in (Closed)" --count
 
 # CSV export
-acli jira workitem search --jql "project = RHIDP" --fields "key,summary,status" --csv
+acli jira workitem search --jql "project = RHIDP" --fields "key,summary,status" --csv --limit 200
 
 # Fetch all results (paginated)
 acli jira workitem search --jql "project = RHIDP AND sprint in openSprints()" --paginate
