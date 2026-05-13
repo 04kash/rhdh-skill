@@ -21,16 +21,7 @@ def colored(text, code):
 def get_gcloud_token():
     gcloud = shutil.which("gcloud")
     if not gcloud:
-        for candidate in [
-            os.path.expanduser("~/Downloads/google-cloud-sdk/bin/gcloud"),
-            "/usr/lib/google-cloud-sdk/bin/gcloud",
-            "/opt/homebrew/bin/gcloud",
-        ]:
-            if os.path.exists(candidate):
-                gcloud = candidate
-                break
-    if not gcloud:
-        return None, "gcloud not found in PATH"
+        return None, "gcloud not on PATH — install Google Cloud CLI and add gcloud to PATH"
 
     result = subprocess.run(
         [gcloud, "auth", "print-access-token"],
@@ -71,7 +62,8 @@ def main():
         else:
             print(colored("✗", "31") + f" {error}")
             print()
-            print("Run: gcloud auth login --enable-gdrive-access")
+            if not (error and "PATH" in error):
+                print("Run: gcloud auth login --enable-gdrive-access")
 
     sys.exit(0 if result["credentials_found"] else 1)
 

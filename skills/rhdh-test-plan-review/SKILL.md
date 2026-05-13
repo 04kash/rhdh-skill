@@ -18,7 +18,7 @@ python ~/.claude/skills/rhdh-jira/scripts/setup.py --json
 
 If not configured, load `~/.claude/skills/rhdh-jira/SKILL.md` and follow its Prerequisites section before continuing.
 
-**Google Sheets API (required):** Check gcloud auth:
+**Google Sheets API (required):** Ensure `gcloud` is on your `PATH`, then check auth:
 
 ```bash
 python scripts/check_gsheets.py
@@ -215,7 +215,7 @@ Choice [d/c/n]:
 
 ### Step 7: Apply changes — direct update
 
-Load `~/.claude/skills/rhdh-jira/references/auth.md` for the token file location and REST API setup.
+Load `~/.claude/skills/rhdh-jira/references/auth.md` for REST API setup. Use the `ACLI_DIR` / `TOKEN_FILE` lines in each snippet below; if `readlink -f` is unavailable on your OS, use the fallbacks in auth.md ("Token Discovery").
 
 Modify only:
 - The version strings within the platform and integration table cells in the ADF
@@ -226,7 +226,8 @@ Preserve all other ADF structure exactly — other tables, headings, paragraphs,
 Update via REST API:
 
 ```bash
-TOKEN_FILE="/opt/homebrew/bin/.jira-token"
+ACLI_DIR=$(dirname "$(readlink -f "$(which acli)")")
+TOKEN_FILE="$ACLI_DIR/.jira-token"
 
 curl -s -X PUT \
   -u "$(cat "$TOKEN_FILE")" \
@@ -261,6 +262,9 @@ No changes have been applied to this ticket.
 Post via REST API:
 
 ```bash
+ACLI_DIR=$(dirname "$(readlink -f "$(which acli)")")
+TOKEN_FILE="$ACLI_DIR/.jira-token"
+
 curl -s -X POST \
   -u "$(cat "$TOKEN_FILE")" \
   -H "Content-Type: application/json" \
@@ -307,6 +311,9 @@ Choice [c/s/e]:
 Create child tasks via REST API:
 
 ```bash
+ACLI_DIR=$(dirname "$(readlink -f "$(which acli)")")
+TOKEN_FILE="$ACLI_DIR/.jira-token"
+
 curl -s -X POST \
   -u "$(cat "$TOKEN_FILE")" \
   -H "Content-Type: application/json" \
@@ -328,7 +335,7 @@ After all child task decisions are collected, print a final summary of what was 
 ## Gotchas
 
 - **ADF round-trip**: The description is ADF (nested JSON). Send ADF when updating via REST — converting to plain text and back destroys formatting. Modify only the version strings inside existing table cells.
-- **Never read `.jira-token` into context.** Use shell substitution: `"$(cat "$TOKEN_FILE")"`. The token file is at `/opt/homebrew/bin/.jira-token` (next to the real `acli` binary, not the symlink).
+- **Never read `.jira-token` into context.** Use `"$(cat "$TOKEN_FILE")"` after setting `ACLI_DIR` / `TOKEN_FILE` like the curl snippets above; if `readlink -f` fails, follow `~/.claude/skills/rhdh-jira/references/auth.md` ("Token Discovery").
 - **Key dates table**: The first table in the description has milestone rows. Match by the label in the first cell (e.g., "Feature Freeze", "Code Freeze"). Update only the date cell (second column). If the row label text differs (e.g., "Code Freeze" vs "RHDH 1.10.0 push"), match loosely on keyword. Leave rows you cannot match untouched.
 - **Version string normalization**: Tables may use "v1.29", "1.29.x", or "Kubernetes 1.29". Normalize to `major.minor` before comparing with lifecycle data.
 - **fixVersions format varies**: May be "1.6", "RHDH 1.6", "rhdh-1.6". Strip prefixes before passing to `fetch_schedule.py`.

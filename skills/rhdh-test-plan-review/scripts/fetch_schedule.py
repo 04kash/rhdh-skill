@@ -43,20 +43,12 @@ def get_gcloud_token():
     import shutil
     import subprocess
 
-    # Find gcloud — check PATH first, then common install locations
     gcloud = shutil.which("gcloud")
     if not gcloud:
-        for candidate in [
-            Path.home() / "Downloads/google-cloud-sdk/bin/gcloud",
-            Path("/usr/lib/google-cloud-sdk/bin/gcloud"),
-            Path("/opt/homebrew/bin/gcloud"),
-        ]:
-            if candidate.exists():
-                gcloud = str(candidate)
-                break
-
-    if not gcloud:
-        return None
+        error_exit(
+            "gcloud_not_found",
+            {"hint": "Install the Google Cloud CLI and ensure gcloud is on your PATH"},
+        )
 
     result = subprocess.run([gcloud, "auth", "print-access-token"], capture_output=True, text=True)
     token = result.stdout.strip()
