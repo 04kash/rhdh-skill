@@ -4,9 +4,9 @@
 import argparse
 import json
 import os
-import shutil
-import subprocess
 import sys
+
+from gcloud_token import get_gcloud_token
 
 _no_color = os.environ.get("NO_COLOR") is not None
 _is_tty = sys.stderr.isatty() and not _no_color
@@ -16,22 +16,6 @@ def colored(text, code):
     if _is_tty:
         return f"\033[{code}m{text}\033[0m"
     return text
-
-
-def get_gcloud_token():
-    gcloud = shutil.which("gcloud")
-    if not gcloud:
-        return None, "gcloud not on PATH — install Google Cloud CLI and add gcloud to PATH"
-
-    result = subprocess.run(
-        [gcloud, "auth", "print-access-token"],
-        capture_output=True,
-        text=True,
-    )
-    token = result.stdout.strip()
-    if token:
-        return token, None
-    return None, "No active gcloud account — run: gcloud auth login --enable-gdrive-access"
 
 
 def main():

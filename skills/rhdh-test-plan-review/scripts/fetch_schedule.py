@@ -1,3 +1,5 @@
+# Note: uses uv run --script for Google API deps (see ADR-0002 for stdlib-only rationale;
+# Google Sheets SDK is an intentional exception)
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.10"
@@ -15,6 +17,14 @@ import os
 import re
 import sys
 from datetime import datetime
+from pathlib import Path
+
+# Sibling import when run as `uv run --script` (script dir may not be on sys.path).
+_scripts_dir = Path(__file__).resolve().parent
+if str(_scripts_dir) not in sys.path:
+    sys.path.insert(0, str(_scripts_dir))
+
+from gcloud_token import get_gcloud_token  # noqa: E402
 
 _no_color = os.environ.get("NO_COLOR") is not None
 _is_tty = sys.stderr.isatty() and not _no_color
@@ -35,29 +45,17 @@ def error_exit(error_key, extra=None):
     sys.exit(1)
 
 
-def get_gcloud_token():
-    """Get an access token from gcloud auth print-access-token."""
-    import shutil
-    import subprocess
-
-    gcloud = shutil.which("gcloud")
-    if not gcloud:
-        error_exit(
-            "gcloud_not_found",
-            {"hint": "Install the Google Cloud CLI and ensure gcloud is on your PATH"},
-        )
-
-    result = subprocess.run([gcloud, "auth", "print-access-token"], capture_output=True, text=True)
-    token = result.stdout.strip()
-    return token if token else None
-
-
 def get_sheets_service():
     from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
 
-    token = get_gcloud_token()
+    token, gcloud_err = get_gcloud_token()
     if not token:
+        if gcloud_err and "PATH" in gcloud_err:
+            error_exit(
+                "gcloud_not_found",
+                {"hint": "Install the Google Cloud CLI and ensure gcloud is on your PATH"},
+            )
         error_exit(
             "credentials_not_found",
             {"hint": "Run 'gcloud auth login --enable-gdrive-access' to authenticate"},
