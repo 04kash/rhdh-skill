@@ -16,10 +16,7 @@ Two dimensions are checked:
 from __future__ import annotations
 
 import argparse
-import json
 import sys
-import urllib.error
-import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -27,24 +24,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "_shared"
 from fetch_yaml import extract_branch, fetch_yaml, list_yaml_files
 from ocp_lifecycle import classify_ocp_versions
 from resolve_repo import resolve_repo_root
+from rhdh_lifecycle import fetch_lifecycle_api, rhdh_supported_ocp_versions
 
 POOL_DIR = "clusters/hosted-mgmt/hive/pools/rhdh"
 CI_CONFIG_DIR = "ci-operator/config/redhat-developer/rhdh"
-LIFECYCLE_API_URL = "https://access.redhat.com/product-life-cycles/api/v1/products"
-
-
-def fetch_api(product_name):
-    """Fetch lifecycle data from the Red Hat Product Life Cycles API."""
-    url = f"{LIFECYCLE_API_URL}?name={product_name.replace(' ', '+')}"
-    req = urllib.request.Request(
-        url, headers={"Accept": "application/json", "User-Agent": "rhdh-skill"}
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            return json.loads(resp.read().decode("utf-8"))
-    except (urllib.error.URLError, OSError) as exc:
-        print(f"ERROR: Failed to fetch lifecycle data for {product_name}: {exc}", file=sys.stderr)
-        sys.exit(1)
 
 
 def ver_key(v):
@@ -123,33 +106,16 @@ def main(argv=None):
     # ------- 3. RHDH lifecycle -------
     print("--- RHDH Lifecycle ---")
     print("  Fetching from Red Hat Product Life Cycles API...")
-    rhdh_response = fetch_api("Red Hat Developer Hub")
-    rhdh_versions_raw = rhdh_response.get("data", [{}])[0].get("versions", [])
+    rhdh_response = fetch_lifecycle_api("Red Hat Developer Hub")
+    from rhdh_lifecycle import parse_rhdh_versions
 
-    rhdh_data = []
-    for ver in rhdh_versions_raw:
-        name = ver.get("name", "")
-        vtype = ver.get("type", "")
-        ocp_compat = ver.get("openshift_compatibility", "")
-        ocp_versions = [v.strip() for v in ocp_compat.split(",") if v.strip()] if ocp_compat else []
-        rhdh_data.append(
-            {
-                "version": name,
-                "type": vtype,
-                "supported": vtype != "End of life",
-                "ocp_versions": ocp_versions,
-            }
-        )
-    rhdh_data.sort(key=lambda v: ver_key(v["version"]) if "." in v["version"] else [0])
+    rhdh_data = parse_rhdh_versions(rhdh_response)
 
     for v in rhdh_data:
         if v["supported"]:
             print(f"  RHDH {v['version']} ({v['type']}): OCP {', '.join(v['ocp_versions'])}")
 
-    rhdh_supported_ocp = sorted(
-        {ocp for v in rhdh_data if v["supported"] for ocp in v["ocp_versions"]},
-        key=ver_key,
-    )
+    rhdh_supported_ocp = rhdh_supported_ocp_versions(rhdh_data)
     print()
     print(f"  OCP versions supported by active RHDH releases: {' '.join(rhdh_supported_ocp)}")
     print()
@@ -166,7 +132,7 @@ def main(argv=None):
     # ------- 4. OCP lifecycle -------
     print("--- OCP Lifecycle ---")
     print("  Fetching from Red Hat Product Life Cycles API...")
-    ocp_response = fetch_api("Red Hat OpenShift Container Platform")
+    ocp_response = fetch_lifecycle_api("Red Hat OpenShift Container Platform")
     ocp_lifecycle = classify_ocp_versions(ocp_response, today)
 
     ocp_supported = [v["version"] for v in ocp_lifecycle if v["ocp_supported"]]

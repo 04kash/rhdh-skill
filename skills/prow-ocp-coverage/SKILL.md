@@ -28,7 +28,8 @@ Use this skill when you need to:
 
 This skill composes data from:
 
-- **`lifecycle-ocp`**: RHDH and OCP version lifecycle data (via shared `ocp-lifecycle.jq`)
+- **`lifecycle-rhdh`**: RHDH release lifecycle and OCP compatibility data
+- **`lifecycle-ocp`**: OCP version lifecycle data (support phases)
 - **`prow-ocp-pools`**: Cluster pool configurations
 - **`prow-ocp-jobs`**: CI test entry configurations
 
@@ -117,6 +118,7 @@ After running the analysis:
 
 ## Related Skills
 
-- **`lifecycle-ocp`** -- Check RHDH and OCP version support status
+- **`lifecycle-rhdh`** -- Check RHDH release lifecycle and OCP compatibility
+- **`lifecycle-ocp`** -- Check OCP version support status
 - **`prow-ocp-pools`** -- List and generate OCP cluster pool configurations
 - **`prow-ocp-jobs`** -- List, generate, add, and remove OCP test entries

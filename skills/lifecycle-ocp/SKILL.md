@@ -1,26 +1,22 @@
 ---
 name: lifecycle-ocp
 description: >-
-  Check which OCP versions are supported by active RHDH releases and which are
-  end-of-life, using the Red Hat Product Life Cycles API for both RHDH and OCP
-  lifecycle data including EUS phases. Supports OCP 4.x and future 5.x+
+  Check OCP version lifecycle status including support phases (Full,
+  Maintenance, EUS) and end-of-life dates, using the Red Hat Product
+  Life Cycles API. Cross-references with RHDH compatibility. Use when
+  asking about OCP version support, EUS phases, or whether a specific
+  OCP version is still supported. Supports OCP 4.x and future 5.x+
 ---
-# Check RHDH and OCP Lifecycle Status
+# Check OCP Version Lifecycle
 
-Query the Red Hat Product Life Cycles API to determine:
-
-- Which RHDH releases are currently supported (Full Support or Maintenance)
-- Which OCP versions each active RHDH release supports
-- Which OCP versions are still supported upstream (including EUS phases)
+Query the Red Hat Product Life Cycles API for OCP version support status.
 
 ## When to Use
 
-Use this skill when you need to check version support status before:
-
-- Adding or removing RHDH cluster pools
-- Adding or removing OCP-versioned CI test entries
-- Planning RHDH release branch OCP coverage
-- Running the `prow-ocp-coverage` analysis skill
+- Check if a specific OCP version is still supported
+- See which OCP versions are in Full Support, Maintenance, or EUS
+- Determine which OCP versions RHDH supports (cross-reference)
+- Before adding or removing OCP cluster pools or CI test entries
 
 ## Prerequisites
 
@@ -29,7 +25,7 @@ Use this skill when you need to check version support status before:
 
 ## Usage
 
-Run the bundled script:
+Show all OCP versions:
 
 ```bash
 uv run scripts/check_ocp_lifecycle.py
@@ -41,42 +37,15 @@ uv run scripts/check_ocp_lifecycle.py
 uv run scripts/check_ocp_lifecycle.py --version 4.16
 ```
 
-### Check a specific RHDH version
+### JSON output
 
 ```bash
-uv run scripts/check_ocp_lifecycle.py --rhdh-version 1.9
-```
-
-### Show only RHDH lifecycle (skip OCP table)
-
-```bash
-uv run scripts/check_ocp_lifecycle.py --rhdh-only
+uv run scripts/check_ocp_lifecycle.py --json
 ```
 
 ## Output
 
-### RHDH Lifecycle Table
-
-Shows each RHDH release with:
-
-| Column | Description |
-|--------|-------------|
-| VERSION | RHDH release version (e.g., `1.9`) |
-| SUPPORTED | `yes` or `no` |
-| TYPE | `Full Support`, `Maintenance Support`, or `End of life` |
-| GA_DATE | General Availability date |
-| FULL_SUPPORT_END | End of Full Support phase |
-| MAINTENANCE_END | End of Maintenance Support phase |
-| SUPPORTED_OCP_VERSIONS | OCP versions this RHDH release officially supports |
-
-After the table, a summary shows:
-
-- The union of OCP versions supported across all active RHDH releases
-- Per-release OCP support breakdown
-
 ### OCP Lifecycle Table
-
-Shows each OCP version (4.x and future 5.x+) with two support indicators:
 
 | Column | Description |
 |--------|-------------|
@@ -89,29 +58,23 @@ Shows each OCP version (4.x and future 5.x+) with two support indicators:
 
 The **RHDH_SUPP** column is the key indicator for CI coverage decisions. An OCP version should only have cluster pools and test entries if `RHDH_SUPP=yes`.
 
-### JSON Summary (stderr)
+## Key Concepts
 
-A JSON object is written to stderr with:
+- **Full Support**: Actively supported, receives patches and security updates
+- **Maintenance Support**: Past full support, still receives critical fixes
+- **Extended Update Support (EUS)**: Extended lifecycle for specific versions
+- **End of life**: No longer receiving any updates
 
-- `rhdh_supported_versions`: Array of active RHDH releases with their OCP compatibility
-- `ocp_versions_supported_by_rhdh`: Deduplicated array of OCP versions supported by any active RHDH release
+An OCP version can be OCP-supported but not RHDH-supported (e.g., an older EUS version that RHDH has dropped).
 
 ## Data Sources
 
-- **RHDH lifecycle**: `https://access.redhat.com/product-life-cycles/api/v1/products?name=Red+Hat+Developer+Hub`
-  - Provides `openshift_compatibility` field per RHDH version (the authoritative source for which OCP versions RHDH supports)
-  - Provides lifecycle phase and dates per RHDH version
 - **OCP lifecycle**: `https://access.redhat.com/product-life-cycles/api/v1/products?name=Red+Hat+OpenShift+Container+Platform`
-  - Provides lifecycle phase and dates per OCP version (Full, Maintenance, EUS Term 1/2)
-
-## Key Concepts
-
-- **RHDH-supported OCP versions** are the OCP versions listed in the `openshift_compatibility` field of active RHDH releases. This is the set that should have cluster pools and CI test entries.
-- **OCP-supported versions** include all OCP versions still receiving updates (Full, Maintenance, or EUS). This is a broader set -- not all OCP-supported versions are relevant for RHDH.
-- An OCP version can be OCP-supported but not RHDH-supported (e.g., an older EUS version that RHDH has dropped).
+- **RHDH compatibility**: Fetched from RHDH lifecycle API for the RHDH_SUPP cross-reference
 
 ## Related Skills
 
+- **`lifecycle-rhdh`**: Check RHDH release lifecycle (GA dates, support phases, OCP compatibility)
 - **`prow-ocp-coverage`**: Cross-reference lifecycle data with pools and job configs
 - **`prow-ocp-pools`**: List and generate OCP cluster pool configurations
 - **`prow-ocp-jobs`**: List, generate, add, and remove OCP test entries

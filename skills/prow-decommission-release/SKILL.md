@@ -14,7 +14,7 @@ Remove all CI configuration for a given RHDH release branch when it reaches end-
 
 - A RHDH release has reached end-of-life and CI jobs should stop running
 - Cleaning up stale release branch configurations after EOL
-- The `prow-ocp-coverage` or `lifecycle-ocp` skill identified a release as end-of-life
+- The `prow-ocp-coverage` or `lifecycle-rhdh` skill identified a release as end-of-life
 
 ## Prerequisites
 
@@ -27,6 +27,7 @@ Remove all CI configuration for a given RHDH release branch when it reaches end-
    - If the user provided a version (e.g., "1.7", "1.8"), use it directly
    - If no version was provided, ask the user for the RHDH release version to decommission
    - List existing release configs to help the user choose:
+
      ```bash
      ls ci-operator/config/redhat-developer/rhdh/redhat-developer-rhdh-release-*.yaml
      ```
@@ -50,6 +51,7 @@ Remove all CI configuration for a given RHDH release branch when it reaches end-
    Edit `core-services/prow/02_config/redhat-developer/rhdh/_prowconfig.yaml` to remove the entire `release-{version}:` block under `branch-protection.orgs.redhat-developer.repos.rhdh.branches`.
 
    The block to remove looks like:
+
    ```yaml
                release-{version}:
                  allow_deletions: false
@@ -82,6 +84,6 @@ Remove all CI configuration for a given RHDH release branch when it reaches end-
 
 ## Related Skills
 
-- **`lifecycle-ocp`**: Check which RHDH releases are end-of-life before decommissioning
+- **`lifecycle-rhdh`**: Check which RHDH releases are end-of-life before decommissioning
 - **`prow-ocp-jobs`**: Verify no remaining OCP test entries reference the decommissioned branch
 - **`prow-ocp-pools`**: Check if any cluster pools should also be removed
