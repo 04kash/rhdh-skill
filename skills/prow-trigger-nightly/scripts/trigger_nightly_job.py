@@ -293,20 +293,28 @@ def build_payload(args: argparse.Namespace) -> dict:
     is_overlay = args.job.startswith(OVERLAY_JOB_PREFIX)
 
     if is_overlay:
-        # Overlay jobs don't support parameter overrides.
-        has_overrides = any((
-            args.image_repo,
-            args.image_registry,
-            args.tag,
-            args.org,
-            args.repo,
-            args.branch,
-        ))
-        if has_overrides:
-            log_warn(
-                "Overlay jobs do not support parameter overrides "
-                "(image, org, repo, branch). These flags will be ignored."
+        # Overlay jobs don't support parameter overrides or alerts.
+        unsupported: list[str] = []
+        if args.image_repo:
+            unsupported.append("--image-repo")
+        if args.image_registry:
+            unsupported.append("--image-registry")
+        if args.tag:
+            unsupported.append("--tag")
+        if args.org:
+            unsupported.append("--org")
+        if args.repo:
+            unsupported.append("--repo")
+        if args.branch:
+            unsupported.append("--branch")
+        if args.send_alerts:
+            unsupported.append("--send-alerts")
+        if unsupported:
+            log_error(
+                f"Overlay jobs do not support: {', '.join(unsupported)}. "
+                "These flags only work with rhdh repo jobs."
             )
+            sys.exit(1)
     else:
         # RHDH repo jobs support full overrides.
         if args.image_repo:
