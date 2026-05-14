@@ -80,7 +80,7 @@ GKE and OSD-GCP each share a single cluster — never run two jobs on the same p
 
 ## Step 2: Options
 
-**Important:** Overlay repo jobs do NOT support parameter overrides via Gangway. The script will error if override flags are passed for an overlay job. If the user selected an overlay job, skip this step and go directly to Step 3. Mention that overlay jobs always run with their default configuration.
+**Important:** Overlay repo jobs only support fork overrides (`--org`, `--repo`, `--branch`). Image overrides (`--image-registry`, `--image-repo`, `--tag`) and `--send-alerts` are NOT supported — the script will error if these are passed for an overlay job. If the user doesn't need fork overrides, skip this step and go directly to Step 3.
 
 For RHDH repo jobs, present all options together. The user picks by number — multiple selections allowed (e.g. "2, 5"):
 

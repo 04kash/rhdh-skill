@@ -293,7 +293,8 @@ def build_payload(args: argparse.Namespace) -> dict:
     is_overlay = args.job.startswith(OVERLAY_JOB_PREFIX)
 
     if is_overlay:
-        # Overlay jobs don't support parameter overrides or alerts.
+        # Overlay jobs support fork overrides only (org, repo, branch).
+        # Image overrides and alerts are not supported.
         unsupported: list[str] = []
         if args.image_repo:
             unsupported.append("--image-repo")
@@ -301,12 +302,6 @@ def build_payload(args: argparse.Namespace) -> dict:
             unsupported.append("--image-registry")
         if args.tag:
             unsupported.append("--tag")
-        if args.org:
-            unsupported.append("--org")
-        if args.repo:
-            unsupported.append("--repo")
-        if args.branch:
-            unsupported.append("--branch")
         if args.send_alerts:
             unsupported.append("--send-alerts")
         if unsupported:
@@ -315,6 +310,13 @@ def build_payload(args: argparse.Namespace) -> dict:
                 "These flags only work with rhdh repo jobs."
             )
             sys.exit(1)
+
+        if args.org:
+            envs["MULTISTAGE_PARAM_OVERRIDE_GITHUB_ORG_NAME"] = args.org
+        if args.repo:
+            envs["MULTISTAGE_PARAM_OVERRIDE_GITHUB_REPOSITORY_NAME"] = args.repo
+        if args.branch:
+            envs["MULTISTAGE_PARAM_OVERRIDE_RELEASE_BRANCH_NAME"] = args.branch
     else:
         # RHDH repo jobs support full overrides.
         if args.image_repo:
