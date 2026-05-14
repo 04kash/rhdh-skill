@@ -1,5 +1,3 @@
-# Note: uses uv run --script for Google API deps (see ADR-0002 for stdlib-only rationale;
-# Google Sheets SDK is an intentional exception)
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.10"
@@ -9,6 +7,8 @@
 #   "google-auth-httplib2>=0.2",
 # ]
 # ///
+# Note: uses uv run --script for Google API deps (see ADR-0002 for stdlib-only rationale;
+# Google Sheets SDK is an intentional exception)
 """Fetch RHDH milestone dates (Feature Freeze, Code Freeze, GA) from the RHDH schedule Google Sheet."""
 
 import argparse
