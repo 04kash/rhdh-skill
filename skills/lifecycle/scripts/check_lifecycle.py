@@ -18,9 +18,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 from rhdh_lifecycle.redhat import (
     fetch_product_lifecycle,
     list_known_products,

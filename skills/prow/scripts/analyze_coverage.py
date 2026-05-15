@@ -24,7 +24,6 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 from rhdh_prow.repo import resolve_repo_root
 from rhdh_prow.yaml import extract_branch, fetch_yaml, list_yaml_files
 

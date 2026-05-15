@@ -11,7 +11,6 @@ import argparse
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 from rhdh_prow.repo import resolve_repo_root
 from rhdh_prow.yaml import fetch_yaml, list_yaml_files
 

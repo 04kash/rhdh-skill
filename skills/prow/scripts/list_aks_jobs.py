@@ -6,9 +6,7 @@
 """List AKS test entries in RHDH CI config files."""
 
 import sys
-from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 from rhdh_prow.k8s_configs import main
 
 if __name__ == "__main__":

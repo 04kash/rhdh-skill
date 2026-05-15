@@ -17,9 +17,7 @@ import sys
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
-from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 from configured_versions import print_configured_versions, resolve_repo_root
 
 AKS_API_URL = "https://releases.aks.azure.com/parsed_data.json"
