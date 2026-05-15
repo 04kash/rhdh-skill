@@ -28,3 +28,9 @@ uv run scripts/check_pg_lifecycle.py --active-only
 | RDS_EOL | Amazon RDS end-of-support date |
 | AZURE_EOL | Azure Database end-of-support date |
 | RELEASE | Upstream release date |
+
+## Action
+
+A PostgreSQL version should be removed from RHDH test coverage when **all three providers** have reached EOL. If only one or two providers have EOL'd but others still support it, keep the version.
+
+For new deployments, recommend the newest major version that is supported by all three providers.

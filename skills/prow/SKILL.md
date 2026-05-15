@@ -28,11 +28,11 @@ What CI management task do you need?
 
 | Query matches | Workflow |
 |---|---|
-| "OCP test", "OCP job", "e2e-ocp", "cluster claim test" | `workflows/ocp-jobs.md` |
+| "OCP test", "OCP job", "e2e-ocp", "add OCP version", "new OCP test" | `workflows/ocp-jobs.md` |
 | "cluster pool", "ClusterPool", "Hive pool" | `workflows/ocp-pools.md` |
 | "coverage", "gap analysis", "what OCP versions are missing" | `workflows/ocp-coverage.md` |
 | "AKS test", "EKS test", "GKE test", "K8s platform jobs" | `workflows/k8s-jobs.md` |
-| "decommission", "EOL release", "remove release branch" | `workflows/decommission-release.md` |
+| "decommission", "EOL release", "remove release branch", "clean up old release" | `workflows/decommission-release.md` |
 
 After reading the workflow, follow it exactly.
 

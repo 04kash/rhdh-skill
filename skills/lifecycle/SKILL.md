@@ -24,13 +24,13 @@ What platform or integration lifecycle do you need to check?
 
 | Query matches | Workflow |
 |---|---|
-| "OCP", "OpenShift version", "OCP 4.x" | `workflows/check-ocp.md` |
+| "OCP", "OpenShift version", "OpenShift EOL", "OpenShift support" | `workflows/check-ocp.md` |
 | "RHDH version", "Developer Hub release", "is RHDH 1.x supported" | `workflows/check-rhdh.md` |
 | "AKS", "Azure Kubernetes" | `workflows/check-aks.md` |
 | "EKS", "Amazon EKS" | `workflows/check-eks.md` |
 | "GKE", "Google Kubernetes" | `workflows/check-gke.md` |
-| "RHBK", "Keycloak", "Quay", any Red Hat product | `workflows/check-redhat.md` |
-| "PostgreSQL", "Postgres", "database versions" | `workflows/check-pg.md` |
+| "RHBK", "Keycloak", "Red Hat Build of Keycloak", "Quay", any Red Hat product | `workflows/check-redhat.md` |
+| "PostgreSQL", "Postgres", "PG", "database versions" | `workflows/check-pg.md` |
 | "all platforms", "full lifecycle check" | Run all workflows in sequence |
 
 After reading the workflow, follow it exactly.
