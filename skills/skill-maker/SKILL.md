@@ -51,8 +51,7 @@ Check each category. Note issues as you go.
 - [ ] Router table maps commands to reference files
 - [ ] All referenced workflow/reference files exist
 - [ ] Essential principles are in SKILL.md, not only in sub-command references
-- [ ] XML tags used consistently if skill has multiple semantic sections (see `references/xml-structure-guide.md`)
-- [ ] Tag names match the established vocabulary (`<essential_principles>`, `<intake>`, `<routing>`, `<reference_index>`, `<success_criteria>`)
+- [ ] If skill has multiple semantic sections, consider XML tags for structure (see `references/xml-structure-guide.md`)
 
 **Scripts** (if present):
 
@@ -192,15 +191,20 @@ Read `references/anti-patterns.md` during drafting to avoid known pitfalls.
 
 ### XML structure (router and domain expertise skills)
 
-Agents parse XML tags more reliably than markdown headings when a skill has multiple semantically distinct sections (principles, intake, routing, references). Use XML tags as structural containers with markdown content inside.
+Agents parse XML tags more reliably than markdown headings when a skill has semantically distinct sections (principles, intake, routing, references). XML tags create unambiguous containers; markdown headings blend together in long prompts.
 
-Read `references/xml-structure-guide.md` for the full tag vocabulary, patterns, and anti-patterns.
+Read `references/xml-structure-guide.md` for suggested patterns and anti-patterns.
 
-**Format decision:**
+**When XML helps:**
 
-- **Simple skill** (single workflow) → Markdown headings. Not enough structure to benefit from XML.
-- **Router skill** (multiple commands) → XML tags for sections, markdown within.
-- **Domain expertise skill** (full lifecycle) → XML tags for sections, markdown within.
+- Skills with an intake question + routing table + essential principles
+- Skills where an agent needs to quickly locate a specific section
+- Skills with inline workflows that need clear start/end boundaries
+
+**When markdown is enough:**
+
+- Simple skills with a single linear workflow
+- Sequential instructional content (phases, steps) where order matters more than section lookup
 
 ### Sub-command router (when applicable)
 
@@ -379,8 +383,7 @@ Before presenting the final skill, verify against this checklist:
 - [ ] Setup gates are defined with fail actions for each gate
 - [ ] Register/mode system classifies before loading references
 - [ ] Capability-gated steps degrade gracefully with one-line skip reasons
-- [ ] Router/domain skills use XML tags for semantic sections (`references/xml-structure-guide.md`)
-- [ ] XML tag names are consistent with established vocabulary (no invented synonyms)
+- [ ] Router/domain skills with distinct sections (intake, routing, principles) consider XML tags for clarity (`references/xml-structure-guide.md`)
 
 ### References
 

@@ -12,33 +12,33 @@ XML tags help agents parse complex prompts unambiguously — especially when a s
 
 **Rule of thumb:** If a skill has an intake question, a routing table, and essential principles, use XML tags. They give agents clear section boundaries that markdown headings can't reliably provide — headings blend together in long prompts, while XML tags create unambiguous containers.
 
-## Established tag vocabulary
+## Suggested tag patterns
 
-Use these consistently across skills. Descriptive, lowercase, underscored names.
+These are patterns that have worked well in practice. Invent new tags as needed — the goal is descriptive, consistent names (lowercase, underscored) that make section boundaries unambiguous.
 
-### Structural tags
+### Common structural tags
 
-| Tag | Purpose | When to use |
+| Tag | Purpose | Example use |
 |---|---|---|
-| `<essential_principles>` | Rules that apply to ALL commands — always loaded | Every router/domain skill |
-| `<intake>` | User-facing menu or intake question | Skills that ask "what do you want to do?" |
-| `<routing>` | Routing table mapping responses to workflows/references | After `<intake>` |
-| `<reference_index>` | List of reference files with "load when..." guidance | Skills with 3+ references |
-| `<success_criteria>` | Observable, verifiable outcomes checklist | Skills with measurable completion |
+| `<essential_principles>` | Rules that apply across all commands | Cross-cutting constraints |
+| `<intake>` | User-facing menu or intake question | "What do you want to do?" |
+| `<routing>` | Table mapping responses to workflows/references | After `<intake>` |
+| `<reference_index>` | Reference files with "load when..." guidance | Skills with multiple references |
+| `<success_criteria>` | Observable, verifiable outcomes checklist | Measurable completion |
 | `<cli_setup>` | CLI initialization — path discovery, variable setup | Skills that depend on a CLI tool |
-| `<context_scan>` | Environment detection run on invocation | Skills that adapt to environment state |
-| `<skills_index>` | Related skills with paths | Skills that route to or depend on other skills |
+| `<context_scan>` | Environment detection run on invocation | Adapting to environment state |
+| `<skills_index>` | Related skills with paths | Cross-skill routing |
 
-### Content tags
+### Other patterns seen in the wild
 
-| Tag | Purpose | When to use |
-|---|---|---|
-| `<principle name="...">` | Individual principle inside `<essential_principles>` | When principles need named identifiers for cross-referencing |
-| `<cli_commands>` | CLI command reference | Skills with a custom CLI |
-| `<workflows_index>` | Workflow files listing | Skills with 3+ workflow files |
-| `<templates_index>` | Template files listing | Skills that provide starter templates |
-| `<tracking_system>` | Activity logging and context persistence | Skills with session tracking |
-| `<inline_*>` | Inline mini-workflows (e.g., `<inline_status_check>`) | Short workflows that don't warrant a separate file |
+| Tag | Purpose |
+|---|---|
+| `<principle name="...">` | Named principle inside `<essential_principles>` for cross-referencing |
+| `<cli_commands>` | CLI command reference |
+| `<workflows_index>` | Workflow files listing |
+| `<templates_index>` | Template files listing |
+| `<tracking_system>` | Activity logging and context persistence |
+| `<inline_*>` | Inline mini-workflows (e.g., `<inline_status_check>`) |
 
 ## Patterns
 
@@ -124,6 +124,6 @@ XML tags are containers — use markdown freely inside them for formatting, tabl
 
 **Don't nest XML deeply.** One level of nesting (`<essential_principles>` → `<principle>`) is the maximum. Deeper nesting creates parsing ambiguity and is harder to read.
 
-**Don't invent new tags when an established one fits.** Check the vocabulary table above first. Consistency across skills means agents learn the pattern once.
+**Prefer existing tag names when they fit.** If your skill has an intake question, `<intake>` is clearer than `<user_prompt>` or `<menu>`. But don't force a tag name that doesn't describe your content — invent a better one.
 
 **Don't put XML tags inside code blocks as examples and expect them to be parsed.** If showing XML as an example, use fenced code blocks. Only bare XML tags in the skill body are treated as structural.
