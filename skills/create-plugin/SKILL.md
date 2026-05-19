@@ -8,7 +8,9 @@ description: >
   "configure mount points", "create dynamic route", "add entity card", "scaffold
   RHDH plugin", "publish plugin to registry", "create tgz archive", or mentions
   creating, exporting, packaging, or wiring a Backstage plugin for Red Hat Developer
-  Hub. Covers backend plugins (APIs, scaffolder actions, processors), frontend plugins
+  Hub. Also use when asked to "build a plugin from scratch", "dynamic plugin
+  tutorial", "RHDH plugin from scratch", or "build Backstage plugin for RHDH".
+  Covers backend plugins (APIs, scaffolder actions, processors), frontend plugins
   (pages, cards, themes), export/packaging (OCI, tgz, npm), and frontend wiring
   configuration (mount points, routes, entity tabs, themes).
 compatibility: "Node.js 22+, Yarn, podman or docker. Windows, macOS, Linux."
@@ -29,6 +31,8 @@ compatibility: "Node.js 22+, Yarn, podman or docker. Windows, macOS, Linux."
 | `export` | Package | Export, package, and push a plugin for RHDH deployment | [references/export.md](references/export.md) |
 | `wiring` | Configure | Analyze a frontend plugin and generate wiring config | [references/wiring.md](references/wiring.md) |
 
+Single source of truth for command descriptions: `scripts/command-metadata.json`
+
 ### Routing rules
 
 1. **No argument**: Show the command table. Ask what the user wants to do.
@@ -41,7 +45,7 @@ compatibility: "Node.js 22+, Yarn, podman or docker. Windows, macOS, Linux."
 
 ### RHDH Version Resolution
 
-Before scaffolding, determine the target RHDH version. Consult `../rhdh/references/versions.md` for the compatibility matrix. Ask the user if not specified.
+Before scaffolding, determine the target RHDH version. Consult `../rhdh/references/versions.md` for the compatibility matrix. If that file is not found (skill installed standalone), ask the user for the target RHDH version directly.
 
 ### Scaffold Script
 

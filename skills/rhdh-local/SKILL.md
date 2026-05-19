@@ -1,6 +1,13 @@
 ---
 name: rhdh-local
-description: Skill for testing RHDH plugins locally using the rhdh-local-setup customization system. Covers enabling/disabling plugins, switching modes, running end-to-end plugin tests, starting/stopping RHDH (up/down), health checks, troubleshooting errors (504, startup failures), and backup/restore of configurations.
+description: >-
+  Test RHDH plugins locally using the rhdh-local-setup customization system.
+  Covers enabling/disabling plugins, switching modes, running end-to-end plugin
+  tests, starting/stopping RHDH (up/down), health checks, troubleshooting errors
+  (504, startup failures), and backup/restore of configurations. Use when asked
+  to "test plugin locally", "local RHDH setup", "start local Developer Hub",
+  "rhdh-local-setup", "local development environment", "podman compose RHDH",
+  or "run RHDH on my machine".
 ---
 
 <essential_principles>
@@ -58,7 +65,7 @@ What would you like to do with your local RHDH instance?
 **Environment variables (.env reference):** `references/env-reference.md`
 **Troubleshooting & comparative testing:** `references/troubleshooting.md`
 **Container lifecycle, startup scripts, network namespace:** `references/troubleshooting.md` — restart patterns, 504 debugging, network namespace rules
-**Dynamic plugin YAML format, OCI references:** `../overlay/references/rhdh-local.md` section `<dynamic_plugins_config>`
+**Dynamic plugin YAML format, OCI references:** `../overlay/references/rhdh-local.md` section `<dynamic_plugins_config>` (if unavailable, see `rhdh-plugin-export-overlays` repo README for YAML format)
 </reference_index>
 
 <skills_index>

@@ -1,6 +1,13 @@
 ---
 name: rhdh
-description: Handles all RHDH-related work — "RHDH", "Red Hat Developer Hub", or "Developer Hub". Primary entry point for plugin development, overlay management, environment setup, repo navigation, version compatibility, CI/CD, configuration, debugging, and general RHDH ecosystem knowledge. Routes to specialized sub-skills as needed.
+description: >-
+  Handles all RHDH-related work — "RHDH", "Red Hat Developer Hub", or "Developer
+  Hub". Primary entry point for plugin development, overlay management,
+  environment setup, repo navigation, version compatibility, CI/CD,
+  configuration, debugging, and general RHDH ecosystem knowledge. Routes to
+  specialized sub-skills as needed. Use when asked about RHDH version
+  compatibility, RHDH CI pipeline, RHDH configuration, which RHDH repo to use,
+  RHDH release status, RHDH debugging, or any Developer Hub question.
 ---
 
 <cli_setup>
@@ -112,7 +119,7 @@ What would you like to do?
 
 ### Test Plan Tasks
 
-*For rhdh test plan review in jira* 
+*For rhdh test plan review in jira*
 
 9. **Review Test Plan content** — Reviews an RHDH test plan Jira ticket and suggests platform/integration version updates based on support lifecycle pages and RHDH release milestones
 

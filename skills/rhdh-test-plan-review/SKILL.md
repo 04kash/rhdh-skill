@@ -59,7 +59,7 @@ Provide a Jira ticket ID or URL (e.g., `RHIDP-8994`) to begin.
 |-----------|---------|------|
 | sources | Lifecycle URLs and extraction guidance per platform/integration | `references/sources.md` |
 | google-sheets-setup | One-time gcloud auth setup for schedule sheet access | `references/google-sheets-setup.md` |
-| rhdh-jira auth | Jira REST API token setup and curl patterns | `~/.claude/skills/rhdh-jira/references/auth.md` |
+| rhdh-jira auth | Jira REST API token setup and curl patterns | `../rhdh-jira/references/auth.md` |
 
 </reference_index>
 
