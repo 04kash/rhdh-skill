@@ -87,7 +87,7 @@ acli jira workitem edit --key "RHIDP-123,RHIDP-124" --assignee "jdoe@example.com
 acli jira workitem edit --jql "project = RHIDP AND labels = 'needs-info'" --labels "needs-pm" --yes
 
 # Add/remove labels
-acli jira workitem edit --key RHIDP-123 --labels "demo,test-day" --yes
+acli jira workitem edit --key RHIDP-123 --labels "demo,rhdh-testday" --yes
 acli jira workitem edit --key RHIDP-123 --remove-labels "needs-info" --yes
 
 # Edit description from file

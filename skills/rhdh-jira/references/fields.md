@@ -50,12 +50,13 @@ All lowercase, hyphen-separated. Labels are global to the Jira instance.
 
 | Label | Usage |
 |-------|-------|
-| `demo` | Customer-facing Features/Epics requiring a feature demo |
-| `needs-info` | Release planning — needs more information |
+| `demo` | Customer-facing Features/Epics requiring a feature demo. See `references/feature-exploration.md`. |
+| `needs-info` | Release planning — needs more information from the feature reporter (Engineering → reporter) |
 | `needs-pm` | Release planning — needs product management input |
 | `stretch` | Feature is a stretch goal for a release |
-| `test-day` | Feature is a Test Day candidate |
-| `rhdh-n.n-candidate` | Feature is a candidate for release n.n (e.g., `rhdh-1.10-candidate`) |
+| `rhdh-testday` | Feature should be tested as part of release test day. Set during Feature Exploration. |
+| `quality` | Continuous improvement issues. **Excluded from code freeze release queries** — use this label (not `ci`) to ensure the issue doesn't block a code freeze. |
+| `rhdh-n.n-candidate` | Feature is a candidate for release n.n (e.g., `rhdh-2.1-candidate`). **Do not remove without PM approval** — removing this label can silently drop a feature from release tracking. |
 | `ci-fail` | Identifies CI failures |
 | `must-have` | Documentation team — must-have for release doc plan |
 | `nice-to-have` | Documentation team — nice-to-have for release doc plan |
@@ -79,17 +80,42 @@ Match by **name** in `issuelinks`, not by ID.
 
 List all available link types with: `acli jira workitem link type`
 
-## Components (RHIDP)
+## Components
 
-Heavily used for filtering and routing. Key components:
+Heavily used for filtering, routing, and freeze queries. Components affect Feature Freeze and Code Freeze scope — some components may be excluded from FF/CF.
 
-Key components (run `acli jira workitem search --jql "project = RHIDP AND component = 'X'" --count` for current counts):
+Key components in RHIDP (run `acli jira workitem search --jql "project = RHIDP AND component = 'X'" --count` for current counts):
 
 Documentation, Security, UI, Lightspeed, Orchestrator, Continuous Improvement, Plugins, Topology
 
 Query by component: `project = RHIDP AND component = 'Documentation'`
 
 Components are not available via `--fields` on search. Use `--json` to get component data.
+
+### Component Validation
+
+When setting components during issue creation or refinement, validate against the project's live component list:
+
+```bash
+# List all components for RHIDP
+curl -s -H "Authorization: Basic $(cat "$TOKEN_FILE")" \
+  "https://redhat.atlassian.net/rest/api/3/project/RHIDP/components" | \
+  python -c "import sys,json; [print(c['name']) for c in json.load(sys.stdin)]"
+
+# List all components for RHDHPLAN
+curl -s -H "Authorization: Basic $(cat "$TOKEN_FILE")" \
+  "https://redhat.atlassian.net/rest/api/3/project/RHDHPLAN/components" | \
+  python -c "import sys,json; [print(c['name']) for c in json.load(sys.stdin)]"
+```
+
+During creation grills:
+
+1. Infer likely components from the issue summary and description
+2. Validate the proposed components exist in the target project
+3. If a component doesn't exist, suggest the closest match
+4. Confirm with the user before setting
+
+See `references/feature-exploration.md` for the full Feature Exploration component checklist.
 
 ## Priorities
 

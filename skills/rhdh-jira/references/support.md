@@ -2,25 +2,72 @@
 
 How support cases flow between RHDHSUPP, RHDHBUGS, and RHDHPLAN.
 
-## Overview
+## Key Concepts
 
-1. Customer creates request on Customer Portal (access.redhat.com)
-2. Support team investigates, reviews documentation and KCS articles
-3. If engineering help needed → Support creates **RHDHSUPP Bug** to track discussion
-4. Investigation continues until resolution
-5. Resolution may produce a **RHDHBUGS Bug** (defect) or **RHDHPLAN Feature Request**
+- **RHDHSUPP** — Internal project for engineering-support conversations. Not public.
+- **RHDHBUGS** — Public project for product defects. **Never include customer information.**
+- **RHDHPLAN** — Public project for feature requests.
+- The engineering support liaison owns the relationship with the support team. Route questions about the support process to them.
 
-## RHDHSUPP → RHDHBUGS (Defect Path)
+## Anti-Pattern: Don't Comment on External Support Tickets
 
-When a product defect is identified during support investigation:
+Engineering discussions happen in **RHDHSUPP issues only**. Do not comment directly on external customer support cases. Instead:
+
+1. Create an internal RHDHSUPP issue
+2. Link it to the external support case
+3. Keep all engineering discussion in the RHDHSUPP issue
+
+This keeps customer-facing communication controlled through the support team.
+
+## Full Workflow
+
+### Step 1 — Customer Creates Request
+
+Customer submits a request on the Customer Portal. Support ensures it has the correct:
+
+- Product and version
+- Severity (1–4, where 1 is highest: 1-hour SLA)
+- Description, trace logs, entitlement
+
+### Step 2 — Support Investigates
+
+A support representative is assigned. They:
+
+- Review documentation and KCS articles
+- Attempt to reproduce and diagnose
+
+### Step 3 — Engineering Engaged (if needed)
+
+If support needs engineering help, they open an **RHDHSUPP Bug** to track the discussion.
+
+- Each RHDHSUPP Bug should be linked to the support ticket
+- Priority, Component, and issue template must be set
+
+### Step 4 — Investigation
+
+Engineering responds following SLA. Investigation continues until an agreed solution is reached.
+
+During investigation, if defects are found that are **unrelated** to the customer case, the engineer should still create RHDHBUGS Bugs to capture them for future work.
+
+### Step 5 — Resolution
+
+Resolutions include:
+
+- Solution or workaround provided
+- Termination of investigation (not supported, no further work possible, technical limitations)
+- Identification of a product defect → go to Step 6
+- Identification of a feature request → go to Step 7
+
+### Step 6 — Product Defect (RHDHSUPP → RHDHBUGS)
+
+When a product defect is identified:
 
 1. Create `Bug` in **RHDHBUGS** with:
    - Priority, Component (use `Documentation` for doc defects)
    - Bug template filled out (reproduction steps, expected behavior)
    - **No customer information** — RHDHBUGS is a public project
    - Link to Customer Case via SFDC Cases Links
-2. Comment on the RHDHSUPP issue with the RHDHBUGS link
-3. This tells the customer when the fix is expected
+2. Comment on the RHDHSUPP issue with the RHDHBUGS link — this tells the customer when the fix is expected
 
 ```bash
 # Create the bug
@@ -38,7 +85,7 @@ acli jira workitem comment create --key RHDHSUPP-456 \
   --body "Defect captured in RHDHBUGS-789. Fix targeted for next y-stream release."
 ```
 
-## RHDHSUPP → RHDHPLAN (Feature Request Path)
+### Step 7 — Feature Request (RHDHSUPP → RHDHPLAN)
 
 When a support case reveals a missing capability:
 
@@ -56,31 +103,33 @@ acli jira workitem create --project RHDHPLAN --type "Feature Request" \
 acli jira workitem link create --out RHDHSUPP-456 --in RHDHPLAN-123 --type "Related" --yes
 ```
 
-## Bug Fix Prioritization
-
-| Scenario | Target Release | Priority |
-|----------|---------------|----------|
-| Default | Next y-stream (e.g., 1.11.0) | As determined by triage |
-| Critical to customer | Current z-stream (e.g., 1.10.4) | Set to **Blocker** |
-| Customer request, not urgent | Future y-stream | As determined by triage |
-
-For z-stream targeting, discuss with the engineer to prioritize. If committed, set Priority to Blocker and the target fix version.
-
-## Closing RHDHSUPP Issues
+### Step 8 — Close RHDHSUPP Issue
 
 Close the RHDHSUPP Bug when:
 
 - Investigation is resolved, OR
 - No response from customer within SLA
 
-On close, set **Story Points** to capture the effort spent on the investigation. See the sizing guide for reference.
+On close, set **Story Points** to capture the effort spent on the investigation. See the sizing guide for RHDHSUPP-specific point scale.
+
+## Bug Fix Prioritization
+
+| Scenario | Target Release | Priority |
+|----------|---------------|----------|
+| Default | Next y-stream (e.g., 1.11.0) | As determined by triage |
+| Critical to customer | Current z-stream (e.g., 1.10.4) | Set to **Blocker** + target fix version |
+| Customer request, not urgent | Future y-stream | As determined by triage |
+
+For z-stream targeting, discuss with the engineer to prioritize. If committed, set Priority to Blocker and the target fix version.
 
 ## Communication Channels
 
 | Channel | Purpose |
 |---------|---------|
 | `#rhdh-support` | Engineering and Developer Hub support team communication |
-| `#rhdh-support-cases` | Notification channel for new RHDHSUPP bugs from support |
+| `#rhdh-support-cases` | Notification channel for new RHDHSUPP bugs from support team |
+
+New support case notifications are managed through Hydra (the internal notification routing tool). Contact the engineering support liaison if notification configuration changes are needed.
 
 ## Ticket SLA
 
@@ -103,3 +152,27 @@ SLA may be negotiated (Negotiated Entitlement Process) or adjusted when a workar
 | **TAM customer** | Technical Account Manager assists with implementation |
 | **Consulting/Partner** | Cases opened during project implementation |
 | **CSE customer** | Customer Success Executive helps communication (non-technical) |
+
+## Reference Resources
+
+The following internal resources exist for deeper reference (access required):
+
+- **RHDH Support Plan** — overall support strategy and staffing
+- **RHDHSUPP CEE Process** — detailed CEE-side workflow
+- **RHDH Support Dashboard / RHDH Supp Kanban Board** — operational views in Jira
+- **RHDH CVE Management** — CVE fix tracking and justifications
+- **RHDH Troubleshooting Guide** — common troubleshooting steps for support cases
+- **Lifecycle Policies** — RHDH, RHPIB, and Red Hat Plug-Ins lifecycle policies (determines support scope per version)
+- **Severity Definition & 24x7 Qualifications** — detailed severity criteria and eligibility
+
+These are internal documents. Do not embed their URLs in agent output or share externally.
+
+## Jira Projects Used in Support
+
+| Project | Purpose | Public? |
+|---------|---------|---------|
+| RHDHSUPP | Internal conversations between support and engineering | No |
+| RHDHBUGS | Product defects — bugs and doc defects | Yes |
+| RHDHPLAN | Feature requests from customers | Yes |
+
+**Security rule:** Never copy customer-identifying information from RHDHSUPP into RHDHBUGS or RHDHPLAN. Those projects are public.

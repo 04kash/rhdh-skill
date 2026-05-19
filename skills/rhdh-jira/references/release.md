@@ -87,7 +87,7 @@ For each Feature, verify expected labels:
 | Label | Required when | Flag if missing |
 |-------|--------------|----------------|
 | `demo` | Customer-facing Feature | "Customer-facing Feature missing `demo` label — needs Feature Demo." |
-| `test-day` | Test Day candidate | Informational only — note if present. |
+| `rhdh-testday` | Test Day candidate | Informational only — note if present. |
 | Documentation component | Feature requires docs | "No Documentation component — will Docs team create an Epic?" |
 
 ### Step 5 — Readiness Score

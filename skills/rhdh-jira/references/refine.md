@@ -142,6 +142,27 @@ For issues in the current sprint, verify they meet the "Planned" criteria:
 
 Flag any sprint issue missing these as "not sprint-ready."
 
+### Check 7 — Feature Exploration Readiness (when context is feature freeze triage or Features are in scope)
+
+For Features, check against the Feature Exploration checklist (`references/feature-exploration.md`):
+
+| Check | How to verify | Severity |
+|-------|---------------|----------|
+| Candidate label | Labels include `rhdh-X.Y-candidate` pattern | error — feature is invisible to release tracking |
+| Components set and valid | At least one component in `JiraComponentsField` | error |
+| `demo` label decision | If feature is customer-facing, check for `demo` label | warning — ask if demo is needed |
+| `rhdh-testday` label decision | If feature is customer-facing, check for `rhdh-testday` label | warning — ask if test day is needed |
+| Child Epics exist | Query `parent = {key}` for Epic children | error if status ≥ Backlog |
+| Cross-team dependencies noted | Check issue links for `Blocks`/`Depend` to other teams | warning if none and feature involves multiple teams |
+| Feature Demo link | Check for demo link in issue links (required at Release Pending) | warning if status approaching Release Pending |
+
+**Freeze-aware filtering:** When running in feature freeze triage context, exclude issues labeled `quality` from the release query — continuous improvement issues are not subject to code freeze.
+
+```jql
+-- Feature freeze query (excludes quality-labeled issues)
+project = RHDHPLAN AND issuetype = Feature AND labels in ("rhdh-X.Y-candidate") AND labels != "quality" AND status != Closed
+```
+
 ## Output
 
 ### Data Contract

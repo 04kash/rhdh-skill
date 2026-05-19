@@ -34,7 +34,24 @@ Follow the challenging behavior in `references/grill.md` on the completed draft.
 
 ### Step 4 — Infer Fields
 
-Infer all Jira fields from the conversation per the Field Inference section in `references/grill.md`. Present recommendations for confirmation. Key fields for Features: Priority, Team, Size (T-shirt), Assignee (Feature Owner), and Labels (`demo`, `rhdh-X.Y-candidate`, `stretch`).
+Infer all Jira fields from the conversation per the Field Inference section in `references/grill.md`. Present recommendations for confirmation.
+
+Key fields for Features: Priority, Team, Size (T-shirt), Assignee (Feature Owner), Components, and Labels.
+
+**Components:** Infer likely components from the feature description. Validate them against the project's component list per `references/feature-exploration.md` → Component Validation. Confirm with the user.
+
+**Labels — ask about each during the grill:**
+
+| Label | Question |
+|-------|----------|
+| `demo` | Does this feature need a customer-facing demo? |
+| `rhdh-testday` | Should this feature be tested during release test day? |
+| `rhdh-X.Y-candidate` | Which release does this target? |
+| `stretch` | Is this a stretch goal? |
+
+**Documentation:** If the feature involves documentation, set the `Documentation` component. After creation, prompt: "Create a Doc EPIC from this Feature? (Feature → More → Create Doc EPIC from RHDHPlan)"
+
+**Cross-team dependencies:** Ask if other scrum teams are affected. If yes, note them — they become Epics in Step 9.
 
 ### Step 5 — Review
 
@@ -128,6 +145,8 @@ If yes:
 
 ## Caveats
 
-1. **Feature Owner responsibility.** Creating a Feature implies ownership. Ensure the assignee understands the Feature Owner responsibilities defined in the RHDH Agile Workflow (single point of contact, coordinates cross-team dependencies, ensures sizing and labels).
-2. **Candidate label convention.** The label format is `rhdh-X.Y-candidate` (e.g., `rhdh-2.1-candidate`). Ask which release this targets during the grill.
+1. **Feature Owner responsibility.** Creating a Feature implies ownership. Ensure the assignee understands the Feature Owner responsibilities (single point of contact, coordinates cross-team dependencies, ensures sizing and labels).
+2. **Candidate label convention.** The label format is `rhdh-X.Y-candidate` (e.g., `rhdh-2.1-candidate`). Ask which release this targets during the grill. **Do not remove candidate labels without PM approval.**
 3. **Description stays structured.** Only template sections go in the description. Decision trail, elaboration, and abandoned approaches go in comments.
+4. **Rescoping.** If the feature is too large for a single release, suggest splitting. Document what's deferred and why as a comment. Adjust the candidate label if the target release changes. See `references/feature-exploration.md` → Rescoping.
+5. **Feature Exploration checklist.** After creation, the Feature should pass the full checklist in `references/feature-exploration.md` before moving to Backlog.

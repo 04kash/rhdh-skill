@@ -121,7 +121,8 @@ Load only what the current task requires.
 | `references/fields.md` | Need to know a field name, custom field ID, accepted values, or label conventions. Custom fields, labels, link types, components, priorities. |
 | `references/workflows.md` | Transitioning issues, checking exit criteria, or verifying readiness for the next status. |
 | `references/templates.md` | Creating new issues. Also load `references/workflows.md` for required fields at entry status. |
-| `references/support.md` | Handling support cases, filing bugs from customer cases, or creating feature requests from support. |
+| `references/support.md` | Handling support cases, filing bugs from customer cases, or creating feature requests from support. Full RHDHSUPP workflow, SLA, and anti-patterns. |
+| `references/feature-exploration.md` | Feature Exploration Process checklist: component validation, labels (demo, rhdh-testday), Doc Epic automation, cross-team dependencies, rescoping. Load when creating Features, refining Features, or checking Feature readiness. |
 | `references/jql-patterns.md` | Building a JQL query, finding a board ID, or looking up sprint information. JQL cookbook with 23+ tested queries. |
 | `references/auth.md` | Setting up authentication for REST API or GraphQL calls. Token file format, path discovery, security, instance config, common auth errors. |
 | `references/rest-api-fallback.md` | `acli` failed to update a custom field (Team, Size, Story Points, Release Note Type). Curl examples, response handling, OpenAPI spec discovery. |
@@ -156,6 +157,8 @@ Load only what the current task requires.
 11. **GraphQL search is beta.** `issueSearchStable` requires `X-ExperimentalApi: JiraIssueSearch` header. Load `references/graphql-queries.md` before attempting GraphQL queries.
 12. **`.jira-token` format is `email:token`, not bare token.** A file containing only the API token without the email prefix will cause 401 errors on REST/GraphQL calls. The `setup.py` script validates the format.
 13. **`acli search` silently truncates results.** The default page size is 30. If your JQL matches more than 30 issues, you get the first 30 with no warning. Always pass `--limit 200` for bulk queries, or use `--count` first to check the total, then `--paginate` to fetch all pages. This is the #2 cause of incorrect reports after skipping `--enrich`.
+14. **"Feature Exploration" vs "Feature Refinement."** The meeting/process is called **Feature Exploration**. The Jira workflow status is **Refinement**. These are different things. When referring to the meeting or process, always use "Feature Exploration." When referring to the Jira status, use "Refinement." The meeting is sometimes mislabeled as "Feature Refinement" in calendar invites — this is incorrect.
+15. **Don't remove `rhdh-X.Y-candidate` labels.** Candidate labels track release targeting. Removing them without PM approval can silently drop a feature from release tracking.
 
 ## Error Handling
 

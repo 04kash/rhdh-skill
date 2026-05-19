@@ -54,6 +54,10 @@ Follow the challenging behavior in `references/grill.md`.
 
 Infer all Jira fields per `references/grill.md` Field Inference. If chained, inherit Priority and Team from parent Feature. Key fields: Team, Priority, Size (T-shirt), Component, Assignee (Epic Owner).
 
+**Components:** Infer from the epic description and validate against the project's component list per `references/fields.md` → Component Validation. If the epic involves documentation, set the `Documentation` component.
+
+**Dependencies:** Link or note key dependencies on other issues, teams, or upstream work.
+
 ### Step 6 — Review
 
 Render the filled template and inferred fields as a temporary markdown file for user review:
@@ -136,6 +140,7 @@ If yes:
 
 ## Caveats
 
-1. **Epic Owner responsibility.** The assignee is the Epic Owner — single point of contact for delivery, works with the Feature Owner to align execution.
-2. **Component is required at New status.** Don't skip this during the grill. See `references/fields.md` for the component list.
+1. **Epic Owner responsibility.** The assignee is the Epic Owner — single point of contact for delivery, works with the Feature Owner to align execution. The Epic Owner is responsible for sizing the Epic.
+2. **Component is required at New status.** Don't skip this during the grill. Validate against `references/fields.md` → Component Validation.
 3. **Multi-team Features create multiple Epics.** When chained from a Feature, each team gets its own Epic. The Feature Owner coordinates across them.
+4. **Size via sizing guide.** Use T-shirt sizing per `references/sizing.md`. If the parent Feature has multiple L or XL Epics, flag for the Feature Owner — the Feature scope may need reassessment.
