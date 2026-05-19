@@ -144,6 +144,7 @@ ENRICHED_SELECT = [
     "assignee",
     "team",
     "story_points",
+    "size",
     "sprint",
     "summary",
 ]

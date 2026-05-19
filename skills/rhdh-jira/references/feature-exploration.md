@@ -11,6 +11,10 @@ The meeting is called **Feature Exploration**. The Jira workflow status is **Ref
 
 Do not confuse the two. When referring to the meeting or process, use "Feature Exploration."
 
+**Features in New status is expected going into Feature Exploration.** The exploration meeting is where the team reviews candidates, identifies risks, and produces the information needed to advance features through the pipeline. Do not frame New→Refinement transition as a prerequisite for exploration — it is an *outcome*. Sizing and field population happen during and after exploration.
+
+**Epic creation can happen before or during exploration.** Teams often create child Epics before the exploration meeting to help size the Feature — aggregate Epic sizes inform the Feature’s T-shirt size. Do not treat Epic creation as exclusively an output of exploration.
+
 ## Feature Exploration Checklist
 
 Team leads, architects, and engineers review feature candidates to identify dependencies and risks.

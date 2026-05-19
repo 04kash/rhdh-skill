@@ -84,36 +84,149 @@ List all available link types with: `acli jira workitem link type`
 
 Heavily used for filtering, routing, and freeze queries. Components affect Feature Freeze and Code Freeze scope — some components may be excluded from FF/CF.
 
-Key components in RHIDP (run `acli jira workitem search --jql "project = RHIDP AND component = 'X'" --count` for current counts):
-
-Documentation, Security, UI, Lightspeed, Orchestrator, Continuous Improvement, Plugins, Topology
-
 Query by component: `project = RHIDP AND component = 'Documentation'`
 
 Components are not available via `--fields` on search. Use `--json` to get component data.
 
-### Component Validation
+### Component Catalog
 
-When setting components during issue creation or refinement, validate against the project's live component list:
+Full list of RHDH project components with descriptions, grouped by category. Freeze exclusion flags indicate which components are excluded from Feature Freeze (FF), Code Freeze (CF), Post-CF, and Release Notes (RN) queries.
+
+**RHDH Core:**
+
+| Component | Description | Excl FF | CF | Post CF | Excl RN |
+|-----------|-------------|---------|----|---------|---------|
+| Adoption Insights | Plugin tracking adoption metrics and usage patterns | | | | |
+| AI Demo | Demo server showcasing AI capabilities in RHDH | Yes | Yes | Yes | Yes |
+| AI Installer | Automated installer for AI-related RHDH components | | | | |
+| ai-templates | Software templates for AI/ML workflows and model onboarding | | | | |
+| ArgoCD | ArgoCD plugin integration (Roadie version migration) | | | | |
+| Authentication | Static auth provider module, dynamic auth provider, service-service auth, SCM auth | | | | |
+| Build | Container image builds, Konflux pipelines, and build infrastructure | Yes | | | Yes |
+| Bulk Import | Bulk import of repositories and entities into the catalog | | | | |
+| Catalog | Backstage software catalog (entity metadata, sources, composability) | | | | |
+| Database | PostgreSQL database support, migrations, and compatibility | | | | |
+| Dynamic Plugins | Dynamic plugin loading, frontend/backend plugin lifecycle | | | | |
+| Dynamic Plugins Factory | Build tooling for producing dynamic plugin artifacts | | | | |
+| Event Systems | Internal event bus for cross-plugin communication | | | | |
+| Extensions | Extension registry, OCI plugin hosting, and catalog sources | | | | |
+| FIPS | FIPS 140-2/140-3 compliance onboarding and validation testing | | | | |
+| Gitlab | Gitlab integration (SCM, events, auth provider) | | | | |
+| Helm Chart | Helm chart for RHDH deployment on OpenShift/Kubernetes | | | | |
+| High Availability | Multi-replica and HA deployment configurations | | | | |
+| Homepage | Dynamic homepage plugin and backend | | | | |
+| LDAP | LDAP auth provider and entity ingestion | | | | |
+| Lightspeed | AI-powered developer assistant plugin | | | | |
+| Localization | i18n and RTL language support | | | | |
+| LTS | Long Term Support release stream and lifecycle management | | | | |
+| MCP | Model Context Protocol server and AI permissions | | | | |
+| model-catalog | AI/ML model catalog plugin for browsing and discovering models | | | | |
+| model-registry-bridge | Bridge plugin connecting RHDH to OpenShift AI model registry | | | | |
+| msgraph/Azure | Microsoft Graph and Azure AD integration | | | | |
+| Mustgather | Diagnostic data collection tool for support case troubleshooting | | | | |
+| News Feed | RSS news feed plugin | | | | |
+| Operator | OLM-based operator for deploying and managing RHDH on OpenShift | | | | |
+| Orchestrator | Serverless workflow orchestration plugin | | | | |
+| Overlay | Overlay repository for plugin packaging and export | | | | |
+| Permissions | Role-based access control (RBAC) and permission policies | | | | |
+| Plugin Development | Plugin SDK, development tooling, and plugin onboarding guides | | | | |
+| Quay | Quay container registry plugin | | | | |
+| Quickstart | Quickstart plugin for guided setup | Yes | | | |
+| RHDH CLI | CLI tooling for plugin export, dependency checks, and scaffolding | | | | |
+| RHDH Local | Local development environment for running RHDH on a developer machine | Yes | | | |
+| rhdh-ai-external | AI related issues for other stakeholders (RHOAI, etc) | | | | |
+| RHEL | RHEL-based container image build and RPM installer | | | | |
+| RHOAI Bridge | Integration bridge between RHDH and Red Hat OpenShift AI | | | | |
+| Scorecard | Scorecard plugin for project health assessment | | | | |
+| Segment | Product telemetry collection and analytics integration | Yes | | | |
+| Tekton | Plugin for viewing and managing Tekton pipelines and tasks | | | | |
+| Test Framework | Shared test utilities and helpers | Yes | | | Yes |
+| Test Infrastructure | Issues related to the team's testing cluster(s) and infra | Yes | | | Yes |
+| Topology | Plugin to visualise Kubernetes workloads and relationships | | | | |
+| UI | RHDH frontend UI shell, theming, and layout | | | | |
+| UX | User experience design, research, and usability | Yes | | | |
+
+**Backstage (upstream):**
+
+| Component | Description | Excl FF | CF | Post CF | Excl RN |
+|-----------|-------------|---------|----|---------|---------|
+| Actions | Scaffolder actions for software template steps | | | | |
+| Audit Log | Audit logging and verification for compliance | | | | |
+| Catalog | Backstage software catalog (upstream) | | | | |
+| Community Plugin | Track updates to Community Plugin repository | | | | Yes |
+| Core Platform & Lifecycle | Backstage core framework, app lifecycle, and platform APIs | | | | |
+| Corporate Proxy | Proxy configuration for corporate/enterprise network environments | | | | |
+| Event Module | Backstage event module for plugin-to-plugin messaging | | | | |
+| Github | GitHub integration (SCM, actions, auth, discovery) | | | | |
+| Kubernetes | Kubernetes plugin for cluster and workload visibility | | | | |
+| Notifications | Email and in-app notification plugins | | | | |
+| On Behalf Of | On-behalf-of (OBO) token delegation for service-to-service auth | | | | |
+| Proxy | Backstage backend proxy for forwarding API requests to external services | | | | |
+| Redis | Redis caching and session store integration | | | | |
+| RHDH Plugin Repo | RHDH-specific plugin repository and distribution | Yes | Yes | Yes | |
+| Software Templates | Scaffolder templates for project and component creation | | | | |
+| TechDocs | Technical documentation generation and rendering | | | | |
+| Upstream & Community | Tracking Backstage contributions | Yes | Yes | Yes | |
+
+**Extension Plugins:**
+
+| Component | Description | Excl FF | CF | Post CF | Excl RN |
+|-----------|-------------|---------|----|---------|---------|
+| 3rd Party Plugin | Plugins for products not built by Red Hat | | | | Yes |
+| 3scale | 3scale API management plugin | | | | |
+| ACR | Azure Container Registry plugin | | | | |
+| Keycloak Provider | Keycloak auth provider and entity ingestion | | | | |
+| Nexus Repository Manager | Nexus Repository Manager plugin | | | | |
+| Open Cluster Management | OCM multi-cluster management plugin | | | | |
+| Regex | Regex-based entity provider plugin | | | | |
+| ServiceNow | ServiceNow integration plugin | | | | |
+
+**Program (non-engineering):**
+
+| Component | Description | Excl FF | CF | Post CF | Excl RN |
+|-----------|-------------|---------|----|---------|---------|
+| AEM Migration | Adobe Experience Manager to docs-as-code migration | Yes | Yes | Yes | Yes |
+| AI | Internal team initiatives leveraging AI for productivity and tooling | Yes | Yes | Yes | Yes |
+| Certification | Plugin certification process and compliance verification | Yes | | | Yes |
+| Conference | Conference talk preparation, demos, and booth materials | Yes | Yes | Yes | Yes |
+| Continuous Improvement | Tracks opportunities to improve team efficiency | Yes | Yes | Yes | Yes |
+| Documentation | Downstream product documentation (guides, API refs, release notes) | Yes | Yes | | |
+| JTBD | Jobs to Be Done - Doc team | Yes | Yes | Yes | Yes |
+| Knowledge | Blogs, articles, KCS artifacts to supplement downstream docs | Yes | Yes | Yes | Yes |
+| Performance | Performance and Scaling for RHDH | Yes | Yes | | |
+| PQC | Post-quantum cryptography readiness and compliance | Yes | Yes | | |
+| Quality | Quality Engineering for RHDH | Yes | | | |
+| Release | Release engineering, version management, and GA/z-stream processes | Yes | Yes | | Yes |
+| Security | Security related JIRAs & CVEs | Yes | Yes | Yes | |
+| Security Tooling | Security tooling like CVE status checker | Yes | Yes | Yes | Yes |
+| Serviceability | Surfacing internal diagnostics and catalog health info | Yes | | | |
+| Support | Customer support case tracking and engineering follow-up | Yes | Yes | | Yes |
+| Team Operations | Scrum ceremonies, team process improvements, and operational tasks | Yes | Yes | Yes | Yes |
+
+### Component Inference
+
+When suggesting components during issue creation or refinement:
+
+1. **Chained from parent:** Inherit the parent Feature's or Epic's components as the starting point
+2. **Standalone:** Match keywords in the summary and description against the component catalog above
+3. **Validate** the proposed components exist in the target project (RHIDP vs RHDHPLAN have different component sets)
+4. **Flag mismatches** — if a component doesn't exist in the target project, suggest the closest match
+5. **Confirm** with the user before setting — never auto-set components without confirmation
+
+If the issue involves documentation, set the `Documentation` component and invoke the Doc Epic automation (see `references/feature-exploration.md`).
+
+### Component Validation (live)
+
+The component catalog above is maintained manually. Components may be added or renamed in Jira without updating this file. Run the validation script to detect drift:
 
 ```bash
-# List all components for RHIDP
-curl -s -H "Authorization: Basic $(cat "$TOKEN_FILE")" \
-  "https://redhat.atlassian.net/rest/api/3/project/RHIDP/components" | \
-  python -c "import sys,json; [print(c['name']) for c in json.load(sys.stdin)]"
-
-# List all components for RHDHPLAN
-curl -s -H "Authorization: Basic $(cat "$TOKEN_FILE")" \
-  "https://redhat.atlassian.net/rest/api/3/project/RHDHPLAN/components" | \
-  python -c "import sys,json; [print(c['name']) for c in json.load(sys.stdin)]"
+python scripts/validate_components.py        # human-readable report
+python scripts/validate_components.py --json  # structured output
 ```
 
-During creation grills:
+The script compares this catalog against live components in RHIDP and RHDHPLAN. It reports components that exist in Jira but are missing from this file (add them), and components listed here that no longer exist in Jira (remove them).
 
-1. Infer likely components from the issue summary and description
-2. Validate the proposed components exist in the target project
-3. If a component doesn't exist, suggest the closest match
-4. Confirm with the user before setting
+Note: Jira may contain legacy or duplicate components that were never cleaned up. Not every Jira component needs to be in this catalog — only components that are actively used for issue routing and freeze queries.
 
 See `references/feature-exploration.md` for the full Feature Exploration component checklist.
 

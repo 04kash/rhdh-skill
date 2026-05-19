@@ -87,6 +87,7 @@ Before attempting any REST API or GraphQL call:
 | `scripts/setup.py` | Verify acli install + auth. Run with `--json` for structured output. |
 | `scripts/parse_issues.py` | Flatten, enrich, and filter acli JSON output. Solves the core problem: `acli search --json` can't return custom fields (team, story points, sprint). Pipe search results in, get clean data out. Use `--enrich` to fetch full fields, `-f team="X"` to filter by team. |
 | `scripts/command-metadata.json` | Single source of truth for sub-command descriptions and argument hints. |
+| `scripts/validate_components.py` | Validate `references/fields.md` component catalog against live Jira projects (RHIDP + RHDHPLAN). Reports drift in both directions. Run with `--json` for structured output. |
 
 ## Projects
 
@@ -159,6 +160,8 @@ Load only what the current task requires.
 13. **`acli search` silently truncates results.** The default page size is 30. If your JQL matches more than 30 issues, you get the first 30 with no warning. Always pass `--limit 200` for bulk queries, or use `--count` first to check the total, then `--paginate` to fetch all pages. This is the #2 cause of incorrect reports after skipping `--enrich`.
 14. **"Feature Exploration" vs "Feature Refinement."** The meeting/process is called **Feature Exploration**. The Jira workflow status is **Refinement**. These are different things. When referring to the meeting or process, always use "Feature Exploration." When referring to the Jira status, use "Refinement." The meeting is sometimes mislabeled as "Feature Refinement" in calendar invites — this is incorrect.
 15. **Don't remove `rhdh-X.Y-candidate` labels.** Candidate labels track release targeting. Removing them without PM approval can silently drop a feature from release tracking.
+16. **Feature→Epic child links use Parent Link, not issuelinks.** Cross-project parent-child relationships (RHDHPLAN Feature → RHIDP Epic) use the `Parent Link` field (`customfield_10018`), not `issuelinks`. To find child Epics of a Feature, use JQL: `project = RHIDP AND type = Epic AND "Parent Link" = RHDHPLAN-XXX`. Checking `issuelinks` will show zero results and produce false "no child Epics" reports.
+17. **REST `/rest/api/3/search` returns 410 Gone.** This endpoint has been removed. Use POST to `/rest/api/3/search/jql` with body `{"jql": "...", "fields": [...], "maxResults": N}` instead. This only affects direct REST calls — `acli search` still works.
 
 ## Error Handling
 
