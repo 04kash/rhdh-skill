@@ -8,11 +8,15 @@ description: >
   "configure mount points", "create dynamic route", "add entity card", "scaffold
   RHDH plugin", "publish plugin to registry", "create tgz archive", or mentions
   creating, exporting, packaging, or wiring a Backstage plugin for Red Hat Developer
-  Hub. Covers backend plugins (APIs, scaffolder actions, processors), frontend plugins
+  Hub. Also use when asked to "build a plugin from scratch", "dynamic plugin
+  tutorial", "RHDH plugin from scratch", or "build Backstage plugin for RHDH".
+  Covers backend plugins (APIs, scaffolder actions, processors), frontend plugins
   (pages, cards, themes), export/packaging (OCI, tgz, npm), and frontend wiring
   configuration (mount points, routes, entity tabs, themes).
 compatibility: "Node.js 22+, Yarn, podman or docker. Windows, macOS, Linux."
 ---
+
+<essential_principles>
 
 ## Prerequisites
 
@@ -20,20 +24,36 @@ compatibility: "Node.js 22+, Yarn, podman or docker. Windows, macOS, Linux."
 - Container runtime (`podman` or `docker`) for OCI packaging
 - Access to a container registry (e.g., quay.io) for publishing
 
-## Commands
+</essential_principles>
 
-| Command | Category | Description | Reference |
-|---------|----------|-------------|-----------|
-| `backend` | Create | Scaffold and implement a backend dynamic plugin | [references/backend.md](references/backend.md) |
-| `frontend` | Create | Scaffold and implement a frontend dynamic plugin | [references/frontend.md](references/frontend.md) |
-| `export` | Package | Export, package, and push a plugin for RHDH deployment | [references/export.md](references/export.md) |
-| `wiring` | Configure | Analyze a frontend plugin and generate wiring config | [references/wiring.md](references/wiring.md) |
+<intake>
 
-### Routing rules
+## What would you like to do?
 
-1. **No argument**: Show the command table. Ask what the user wants to do.
-2. **First word matches a command**: Load its reference file and follow it.
-3. **First word doesn't match**: Infer intent from context. "Create a new API plugin" → `backend`. "Package my plugin as OCI" → `export`. "Generate mount points" → `wiring`.
+| # | Category | Command | Description |
+|---|----------|---------|-------------|
+| 1 | Create | `backend` | Scaffold and implement a backend dynamic plugin |
+| 2 | Create | `frontend` | Scaffold and implement a frontend dynamic plugin |
+| 3 | Package | `export` | Export, package, and push a plugin for RHDH deployment |
+| 4 | Configure | `wiring` | Analyze a frontend plugin and generate wiring config |
+
+Single source of truth for command descriptions: `scripts/command-metadata.json`
+
+**Wait for response before proceeding.**
+
+</intake>
+
+<routing>
+
+| Response | Reference |
+|----------|----------|
+| 1, "backend", "create backend", "API plugin", "scaffolder action" | [references/backend.md](references/backend.md) |
+| 2, "frontend", "create frontend", "page", "card", "theme" | [references/frontend.md](references/frontend.md) |
+| 3, "export", "package", "OCI", "tgz", "publish", "push" | [references/export.md](references/export.md) |
+| 4, "wiring", "mount points", "routes", "entity tabs" | [references/wiring.md](references/wiring.md) |
+| First word doesn't match | Infer intent from context. "Create a new API plugin" → `backend`. "Package my plugin as OCI" → `export`. "Generate mount points" → `wiring`. |
+
+</routing>
 
 ## Shared Knowledge
 
@@ -41,7 +61,7 @@ compatibility: "Node.js 22+, Yarn, podman or docker. Windows, macOS, Linux."
 
 ### RHDH Version Resolution
 
-Before scaffolding, determine the target RHDH version. Consult `../rhdh/references/versions.md` for the compatibility matrix. Ask the user if not specified.
+Before scaffolding, determine the target RHDH version. Consult `../rhdh/references/versions.md` for the compatibility matrix. If that file is not found (skill installed standalone), ask the user for the target RHDH version directly.
 
 ### Scaffold Script
 
@@ -79,6 +99,8 @@ The typical workflow chains these commands:
 
 Each reference file is self-contained. Load only the one you need.
 
+<reference_index>
+
 ## Reference Index
 
 ### Command References
@@ -106,6 +128,8 @@ Each reference file is self-contained. Load only the one you need.
 |------|----------|
 | `examples/dynamic-plugins.yaml` | Backend, frontend, multi-plugin, tgz, npm, and local config patterns |
 | `examples/frontend-wiring.yaml` | All frontend wiring patterns — tabs, cards, search, themes, scaffolder |
+
+</reference_index>
 
 ## Common Issues
 

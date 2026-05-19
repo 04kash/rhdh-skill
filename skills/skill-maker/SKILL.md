@@ -15,6 +15,7 @@ What do you need to do?
 2. **Create a new skill** — Interview, draft, and review from scratch
 3. **Consolidate skills** — Merge multiple skills into fewer
 
+**Wait for response before proceeding.**
 </intake>
 
 <routing>

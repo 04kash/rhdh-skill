@@ -1,6 +1,13 @@
 ---
 name: overlay
-description: Manages the rhdh-plugin-export-overlays repository — onboards plugins to the Extensions Catalog, updates plugin versions, fixes overlay build failures, triages and analyzes PRs, triggers publishes, and manages plugin workspaces. Use when working with overlays, importing plugins, debugging CI, checking PRs, or bumping versions.
+description: >-
+  Manages the rhdh-plugin-export-overlays repository — onboards plugins to the
+  Extensions Catalog, updates plugin versions, fixes overlay build failures,
+  triages and analyzes PRs, triggers publishes, and manages plugin workspaces.
+  Use when working with overlays, importing plugins, debugging CI, checking PRs,
+  bumping versions, or mentions "Extensions Catalog", "overlay build failed",
+  "plugin registry", "overlay PR", "overlay doctor", "plugin import",
+  "add plugin to catalog", "onboard plugin", or "plugin workspace".
 ---
 
 <cli_setup>
@@ -136,7 +143,7 @@ gh pr view <number> --repo $REPO --json statusCheckRollup \
 2. No `do-not-merge` label
 3. Publish check not already successful
 
-See `../rhdh/references/github-reference.md` for full patterns.
+See `../rhdh/references/github-reference.md` for full patterns. If unavailable, use standard `gh` CLI patterns.
 </inline_publish_trigger>
 
 <reference_index>
@@ -146,7 +153,7 @@ See `../rhdh/references/github-reference.md` for full patterns.
 **PR label priorities:** references/label-priority.md
 **RHDH Local testing:** references/rhdh-local.md
 
-**For GitHub/JIRA patterns:** See `../rhdh/references/`
+**For GitHub/JIRA patterns:** See `../rhdh/references/` (if unavailable, use standard `gh` / `acli` patterns)
 </reference_index>
 
 <workflows_index>

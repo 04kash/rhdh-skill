@@ -1,4 +1,8 @@
-"""Shared gcloud access token helper for rhdh-test-plan-review scripts."""
+"""Shared gcloud access token helper for rhdh-test-plan-review scripts.
+
+Library module — imported by check_gsheets.py and fetch_schedule.py.
+Not a CLI script; do not invoke directly.
+"""
 
 import shutil
 import subprocess

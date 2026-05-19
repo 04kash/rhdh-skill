@@ -5,9 +5,15 @@ description: |
 compatibility: "acli (Atlassian CLI) on PATH. Python 3 for scripts. Windows, macOS, Linux."
 ---
 
+<essential_principles>
+
 # RHDH Jira
 
 Foundational skill for interacting with RHDH's Jira instance via the Atlassian CLI (`acli`). Covers all four active projects, issue types, workflows, custom fields, and JQL patterns.
+
+</essential_principles>
+
+<intake>
 
 ## Commands
 
@@ -25,11 +31,19 @@ Foundational skill for interacting with RHDH's Jira instance via the Atlassian C
 
 Single source of truth for command descriptions: `scripts/command-metadata.json`
 
+**Wait for response before proceeding.**
+
+</intake>
+
+<routing>
+
 ### Routing rules
 
 1. **No argument**: Show the command menu. Ask what to do.
 2. **First word matches a command**: Load its reference file and follow it.
 3. **First word doesn't match**: General Jira invocation using the full argument as context — use the reference files table below to decide what to load.
+
+</routing>
 
 ## Prerequisites
 
@@ -95,6 +109,8 @@ RHDHPAI (Plugins and AI) is **archived** — JQL queries against it will fail.
 - **Sub-task** — child of any issue type above
 - **Vulnerability** — CVE tracking in RHIDP (Product Security)
 
+<reference_index>
+
 ## Reference Files
 
 Load only what the current task requires.
@@ -122,6 +138,8 @@ Load only what the current task requires.
 | `references/duplicates.md` | Duplicate detection for pre-creation checks and refinement audits. Shared across creation commands and refine. |
 | `references/grill.md` | Shared challenging behavior for issue creation grills: sizing, completeness, scope, risks, cross-referencing. |
 | `references/sizing.md` | T-shirt sizing guide for Features/Epics and Fibonacci story points for Stories/Tasks. Used during grills and refinement. |
+
+</reference_index>
 
 ## Common Gotchas
 

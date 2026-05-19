@@ -1,18 +1,18 @@
 {
   "backend": {
-    "description": "Scaffold and implement a backend dynamic plugin for RHDH. Use when creating a new backend API plugin, backend module, scaffolder action, catalog processor, or authentication module for Red Hat Developer Hub.",
-    "argumentHint": "[plugin description or name]"
+    "description": "Scaffold and implement a backend dynamic plugin (API, scaffolder action, processor).",
+    "argumentHint": "[plugin description or plugin ID]"
   },
   "frontend": {
-    "description": "Scaffold and implement a frontend dynamic plugin for RHDH. Use when creating a new page, entity card, sidebar item, theme, scaffolder field extension, or TechDocs addon for Red Hat Developer Hub.",
-    "argumentHint": "[plugin description or name]"
+    "description": "Scaffold and implement a frontend dynamic plugin (page, card, theme).",
+    "argumentHint": "[plugin description or plugin ID]"
   },
   "export": {
-    "description": "Export and package a Backstage plugin as an RHDH dynamic plugin. Use when exporting as OCI image, tgz archive, or npm package, pushing to a container registry, or bundling multiple plugins.",
-    "argumentHint": "[plugin directory or packaging options]"
+    "description": "Export, package, and push a plugin for RHDH deployment (OCI, tgz, npm).",
+    "argumentHint": "[plugin directory or plugin ID]"
   },
   "wiring": {
-    "description": "Analyze an existing Backstage frontend plugin and generate the RHDH dynamic plugin wiring configuration. Use when generating dynamic-plugins.yaml config, mount points, routes, entity tabs, or theme config.",
-    "argumentHint": "[plugin directory to analyze]"
+    "description": "Analyze a frontend plugin and generate dynamic-plugins.yaml wiring config.",
+    "argumentHint": "[plugin directory or plugin ID]"
   }
 }

@@ -19,6 +19,9 @@ RHDH_SKILL_DIR = PROJECT_ROOT / "skills" / "rhdh"
 # Path to the overlay skill directory (markdown-only)
 OVERLAY_SKILL_DIR = PROJECT_ROOT / "skills" / "overlay"
 
+# Path to the skill-maker skill directory (markdown-only)
+SKILL_MAKER_DIR = PROJECT_ROOT / "skills" / "skill-maker"
+
 # Add orchestrator skill directory to path for testing
 if str(RHDH_SKILL_DIR) not in sys.path:
     sys.path.insert(0, str(RHDH_SKILL_DIR))
@@ -63,6 +66,12 @@ def skills_dir():
 def overlay_skill_dir():
     """Return the overlay skill directory path (skills/overlay)."""
     return OVERLAY_SKILL_DIR
+
+
+@pytest.fixture
+def skill_maker_dir():
+    """Return the skill-maker directory path (skills/skill-maker)."""
+    return SKILL_MAKER_DIR
 
 
 @pytest.fixture

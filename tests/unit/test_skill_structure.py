@@ -165,6 +165,22 @@ class TestOverlaySkillMd:
                     pytest.fail(f"Found markdown heading in <{section_name}>: {line.strip()}")
 
 
+class TestSkillMakerSkillMd:
+    """Test that skill-maker SKILL.md keeps router intake pause instructions."""
+
+    @pytest.fixture
+    def skill_md(self, skill_maker_dir):
+        """Load skill-maker SKILL.md content."""
+        skill_path = skill_maker_dir / "SKILL.md"
+        return skill_path.read_text(encoding="utf-8")
+
+    def test_intake_waits_for_user_response(self, skill_md):
+        """The intake section must tell the agent to wait before routing."""
+        match = re.search(r"<intake>(.*?)</intake>", skill_md, re.DOTALL)
+        assert match, "SKILL.md missing <intake> section"
+        assert "**Wait for response before proceeding.**" in match.group(1)
+
+
 class TestWorkflowStructure:
     """Test that workflow files have required structure."""
 

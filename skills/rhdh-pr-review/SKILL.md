@@ -9,6 +9,7 @@ This skill uses the orchestrator CLI for activity tracking. **Set up first:**
 ```bash
 RHDH=../rhdh/scripts/rhdh
 ```
+
 </cli_setup>
 
 <essential_principles>
@@ -66,9 +67,8 @@ Both paths preserve existing Backstage CRs, config, and Keycloak state — only 
 | Reference | Purpose | Path |
 |-----------|---------|------|
 | operator-pr-images | CI image extraction and validation | `references/operator-pr-images.md` |
-| github-reference | gh CLI patterns, PR queries | `../rhdh/references/github-reference.md` |
-| rhdh-repos | RHDH ecosystem repository map | `../rhdh/references/rhdh-repos.md` |
-
+| github-reference | gh CLI patterns, PR queries | `../rhdh/references/github-reference.md` (if unavailable, use standard `gh` CLI patterns) |
+| rhdh-repos | RHDH ecosystem repository map | `../rhdh/references/rhdh-repos.md` (if unavailable, see CONTEXT.md for repo list) |
 
 </reference_index>
 
