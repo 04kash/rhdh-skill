@@ -98,13 +98,17 @@ Constraint: `--image-repo` requires `--tag`, but `--tag` works on its own.
 
 ### Follow-up based on selections
 
-**If 2 or 3 selected (quay.io registry)** — fetch available tags and present as numbered options:
+**If 2 or 3 selected (quay.io registry)** — fetch available tags and present as numbered options. For `release-*` branches, derive `--tag-filter` by stripping the `release-` prefix. For `main`, omit `--tag-filter` to show all available versions:
 
 ```bash
-uv run scripts/trigger_nightly_job.py --list-tags [--image-repo <REPO>]
+# For release-1.10 branch:
+uv run scripts/trigger_nightly_job.py --list-tags --tag-filter 1.10
+
+# For main branch (show all versions):
+uv run scripts/trigger_nightly_job.py --list-tags
 ```
 
-Default repo is `rhdh/rhdh-hub-rhel9`. Present the numbered results with a final option to enter a custom tag (e.g. `next`, `latest`). For option 3, also ask for the image repository.
+Use `--image-repo <REPO>` to query a different image repository (default: `rhdh/rhdh-hub-rhel9`). Present the numbered results with a final option to enter a custom tag (e.g. `next`, `latest`). For option 3, also ask for the image repository.
 
 **If 4 selected (non-quay registry)** — ask for all three values (tag fetching not available):
 - Registry (e.g. `brew.registry.redhat.io`)
@@ -140,7 +144,7 @@ After execution, show the API response. If a job URL or ID is returned, display 
 
 ## Reference
 
-- Script flags: `-j/--job`, `-l/--list`, `-T/--list-tags`, `-I/--image-registry`, `-q/--image-repo`, `-t/--tag`, `-o/--org`, `-r/--repo`, `-b/--branch`, `-S/--send-alerts`, `-n/--dry-run`
+- Script flags: `-j/--job`, `-l/--list`, `-T/--list-tags`, `--tag-filter`, `-I/--image-registry`, `-q/--image-repo`, `-t/--tag`, `-o/--org`, `-r/--repo`, `-b/--branch`, `-S/--send-alerts`, `-n/--dry-run`, `--json`
 - Dedicated kubeconfig at `~/.config/openshift-ci/kubeconfig` — won't interfere with your current cluster context
 - If auth is needed, the script opens a browser for SSO login
 - RHDH jobs list: https://prow.ci.openshift.org/configured-jobs/redhat-developer/rhdh

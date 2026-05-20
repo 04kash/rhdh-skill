@@ -212,35 +212,76 @@ def list_jobs(*, json_output: bool = False) -> None:
 DEFAULT_IMAGE_REPO = "rhdh/rhdh-hub-rhel9"
 
 
-def list_tags(image_repo: str, limit: int = 20, *, json_output: bool = False) -> None:
-    """Fetch and print available image tags from quay.io."""
+def _fetch_quay_tags(image_repo: str, like_filter: str) -> list[dict]:
+    """Fetch tags from the Quay API with a ``like:`` substring filter."""
     encoded_repo = urllib.request.quote(image_repo, safe="")
-    url = f"https://quay.io/api/v1/repository/{encoded_repo}/tag/?limit={limit}&onlyActiveTags=true"
+    encoded_filter = urllib.request.quote(like_filter, safe="")
+    url = (
+        f"https://quay.io/api/v1/repository/{encoded_repo}/tag/"
+        f"?limit=100&onlyActiveTags=true&filter_tag_name=like:{encoded_filter}"
+    )
     req = urllib.request.Request(url, headers={"User-Agent": "rhdh-skill"})
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read().decode("utf-8"))
     except (urllib.error.URLError, OSError) as exc:
-        log_error(f"Failed to fetch tags from quay.io: {exc}")
-        sys.exit(1)
+        log_warn(f"Failed to fetch tags (filter={like_filter!r}): {exc}")
+        return []
+    return data.get("tags", [])
 
-    tags = [
-        t["name"]
-        for t in data.get("tags", [])
-        if re.match(r"^[0-9]+\.[0-9]+(-[0-9]+)?$", t.get("name", ""))
-    ]
+
+def _fetch_version_tags(image_repo: str, tag_filter: str = "") -> list[str]:
+    """Fetch version tags from quay.io for the given image repo.
+
+    If *tag_filter* is provided (e.g. ``1.10``), a single Quay request with
+    ``filter_tag_name=like:<tag_filter>`` is issued — fast and precise.
+
+    Without a filter, two requests are made for the ``1.`` and ``2.`` major
+    version prefixes and the results are merged, covering current and upcoming
+    RHDH releases.
+
+    In both cases the results are filtered locally by a strict version regex
+    (``MAJOR.MINOR`` or ``MAJOR.MINOR-BUILD``) to discard digest artifacts
+    that happen to match the substring filter.
+    """
+    version_re = re.compile(r"^[0-9]+\.[0-9]+(-[0-9]+)?$")
+
+    if tag_filter:
+        prefixes = [tag_filter]
+    else:
+        prefixes = ["1.", "2."]
+
+    seen: set[str] = set()
+    tags: list[str] = []
+    for prefix in prefixes:
+        for t in _fetch_quay_tags(image_repo, prefix):
+            name = t.get("name", "")
+            if name not in seen and version_re.match(name):
+                seen.add(name)
+                tags.append(name)
+
     tags.sort(key=lambda t: [int(x) for x in re.split(r"[-.]", t)])
+    return tags
+
+
+def list_tags(
+    image_repo: str, limit: int = 20, *, tag_filter: str = "", json_output: bool = False
+) -> None:
+    """Fetch and print available image tags from quay.io."""
+    tags = _fetch_version_tags(image_repo, tag_filter=tag_filter)
 
     if not tags:
         log_error(f"No matching tags found for {image_repo}")
         sys.exit(1)
 
+    # JSON always returns all tags; human output shows the latest N.
     if json_output:
         print(json.dumps({"image_repo": image_repo, "tags": tags}, indent=2))
         return
 
-    log_info(f"Available tags for {image_repo}:")
-    for i, tag in enumerate(tags, 1):
+    display_tags = tags[-limit:]
+    log_info(f"Available tags for {image_repo} (latest {len(display_tags)}):")
+    for i, tag in enumerate(display_tags, 1):
         print(f"  {i}. {tag}")
 
 
@@ -483,6 +524,12 @@ Examples:
         dest="list_tags",
         help="List available image tags from quay.io. Use --image-repo to specify the repo.",
     )
+    parser.add_argument(
+        "--tag-filter",
+        dest="tag_filter",
+        default="",
+        help="Filter tags by version prefix (e.g. '1.10'). Used with --list-tags.",
+    )
 
     overrides = parser.add_argument_group("RHDH job overrides (not supported for overlay jobs)")
     overrides.add_argument(
@@ -557,6 +604,9 @@ def validate_args(args: argparse.Namespace) -> None:
         log_error("Either --list, --list-tags, or --job is required.")
         sys.exit(1)
 
+    if args.tag_filter and not args.list_tags:
+        log_warn("--tag-filter is only used with --list-tags, ignoring.")
+
     if args.job:
         if not args.job.startswith("periodic-ci-"):
             log_error(f"Job name must start with 'periodic-ci-', got: {args.job}")
@@ -602,7 +652,11 @@ def main(argv: list[str] | None = None) -> None:
         return
 
     if args.list_tags:
-        list_tags(args.image_repo or DEFAULT_IMAGE_REPO, json_output=args.json_output)
+        list_tags(
+            args.image_repo or DEFAULT_IMAGE_REPO,
+            tag_filter=args.tag_filter,
+            json_output=args.json_output,
+        )
         return
 
     payload = build_payload(args)
