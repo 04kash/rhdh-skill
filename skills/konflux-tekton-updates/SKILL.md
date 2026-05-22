@@ -91,3 +91,4 @@ Use live `MIGRATION.md` as source of truth. Common cases:
 - Leaving removed task params (`dev-package-managers`, `COMMIT_SHA` on `build-image-index`).
 - Adding `verify_*` guards that fail on the next Konflux bump.
 - Dropping `image-expires-after` from PLRs only because `build-image-index` no longer uses it.
+- Hardcoding `1-` in `generatePipelineRunsForPlugins.sh` Containerfile comments; use `${RHDH_XY_VERSION}` so `1.10.0` becomes `1-10`, not `1`.
