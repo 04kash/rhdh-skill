@@ -36,9 +36,10 @@ After a **minor** Konflux task tag bump, update `.tekton` pipelines and generato
 | Marker in repo | Read |
 |----------------|------|
 | `.tekton/generatePipelineRunsForPlugins.sh` | [references/plugin-catalog.md](references/plugin-catalog.md) |
-| `.tekton-templates/rhdh-pipeline.yaml` | [references/rhdh-midstream.md](references/rhdh-midstream.md) |
+| `.tekton-templates/rhdh-pipeline.yaml` | [references/rhdh-midstream.md](references/rhdh-midstream.md) — **variant A** (unified) |
+| `.tekton-templates/rhdh-hub.yaml` (no `rhdh-pipeline.yaml`) | [references/rhdh-midstream.md](references/rhdh-midstream.md) — **variant B** (1.9 shared build-pipeline) |
 
-If both exist, apply changes for the repo you are working in.
+If both plugin-catalog and midstream markers exist, apply changes only for the repo/branch you are on.
 
 ## Workflow
 
@@ -49,9 +50,10 @@ cd .tekton
 ./updateDigests.sh --minor --no-push
 ```
 
-- Updates `tag@sha256` in `*.yaml` (and `.tekton-templates/*.yaml` in RHDH midstream).
+- Updates `tag@sha256` in `.tekton/*.yaml` and `.tekton-templates/*.yaml` (via `TEMPLATEPATH`).
+- On variant B, also updates `.tekton/build-pipeline-rhdh-*.yaml`.
 - Tag changes list `MIGRATION.md` URLs under `konflux-ci/build-definitions`.
-- Digest-only: `./updateDigests.sh --no-push -q`
+- Digest-only (no tag bump): `./updateDigests.sh --no-push -q`
 
 Review `git diff` for `quay.io/konflux-ci/tekton-catalog/task-*` changes.
 
@@ -60,19 +62,34 @@ Review `git diff` for `quay.io/konflux-ci/tekton-catalog/task-*` changes.
 For each URL from `updateDigests.sh` (or from the diff):
 
 1. Read `MIGRATION.md`.
-2. Apply **only** documented user actions.
+2. Apply **only** documented user actions in templates and shared pipelines (see [references/rhdh-midstream.md](references/rhdh-midstream.md) for per-variant file list).
 3. Skip “no action required” sections.
 
-### 3. Regenerate (optional)
+If PLRs still contain removed params (e.g. `dev-package-managers`) but templates are fixed, migrations are incomplete until step 3.
 
-After fixing shared pipelines/templates and generator scripts:
+### 3. Regenerate PipelineRuns
 
-- **plugin-catalog:** `./generatePipelineRunsForPlugins.sh -v <x.y.z> --nopush`
-- **RHDH midstream:** `./generatePipelineRuns.sh -t <x.y>`
+**Always run** after template or shared-pipeline migration edits (not optional when params changed):
+
+```bash
+cd .tekton
+./generatePipelineRuns.sh -t <version>
+```
+
+| Branch example | `-t` value | PLR suffix |
+|----------------|------------|------------|
+| `rhdh-1-rhel-9` | `1` | `rhdh-hub-1-push.yaml` |
+| `rhdh-1.9-rhel-9` | `1.9` | `rhdh-hub-1-9-push.yaml` |
+| `rhdh-1.10-rhel-9` | `1.10` | `rhdh-hub-1-10-push.yaml` |
+
+- **Variant A:** also patch `rhdh-rag-content-<N>-{push,pull}.yaml` by hand (inline `pipelineSpec`, not generated).
+- **Variant B:** hub/operator PLRs regenerate from `rhdh-hub.yaml` / `rhdh-operator.yaml`; `build-pipeline-*.yaml` is edited directly, not by the generator.
+
+Commit migration + regen locally when ready; do not push until human review.
 
 ### 4. Human review and push
 
-Human reviews the full diff, then `git push` or opens a PR.
+Human reviews the full diff (digest commit plus any migration/regen commits), then `git push` or opens a PR.
 
 ## Known migration patterns
 
@@ -80,8 +97,8 @@ Use live `MIGRATION.md` as source of truth. Common cases:
 
 | Task | Action |
 |------|--------|
-| `prefetch-dependencies-oci-ta` 0.2→0.3 | Remove `dev-package-managers`; add pipeline param `enable-package-registry-proxy` (default `"true"`) and pass to prefetch task |
-| `build-image-index` 0.2→0.3 | Remove `COMMIT_SHA` / `IMAGE_EXPIRES_AFTER` from **build-image-index** task only; keep `image-expires-after` on buildah/prefetch |
+| `prefetch-dependencies-oci-ta` 0.2→0.3 | Remove `dev-package-managers`; add pipeline param `enable-package-registry-proxy` (default `"true"`) and pass to prefetch task. Variant B: also add param on `build-pipeline-rhdh-{hub,operator}.yaml` tasks `prefetch-dependencies-hub` / `prefetch-dependencies-operator`, and on PLR `spec.params` in `rhdh-hub.yaml` / `rhdh-operator.yaml`. |
+| `build-image-index` 0.2→0.3 | Remove `COMMIT_SHA` / `IMAGE_EXPIRES_AFTER` from **build-image-index** task only; keep on buildah (`build-container`) and prefetch |
 | `init` 0.3→0.4 | No pipeline changes |
 | `init` 0.4.1→0.4.2 | Remove broken auto-added `sast-target-dirs` pipeline param if present |
 
@@ -89,6 +106,8 @@ Use live `MIGRATION.md` as source of truth. Common cases:
 
 - Pushing without `--no-push` / `--nopush` and human sign-off.
 - Leaving removed task params (`dev-package-managers`, `COMMIT_SHA` on `build-image-index`).
+- Skipping `generatePipelineRuns.sh` after fixing templates while PLRs still reference old params.
+- Editing only PLRs when templates or `build-pipeline-*.yaml` are the source of truth.
 - Adding `verify_*` guards that fail on the next Konflux bump.
 - Dropping `image-expires-after` from PLRs only because `build-image-index` no longer uses it.
 - Hardcoding `1-` in `generatePipelineRunsForPlugins.sh` Containerfile comments; use `${RHDH_XY_VERSION}` so `1.10.0` becomes `1-10`, not `1`.
