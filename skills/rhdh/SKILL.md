@@ -168,7 +168,7 @@ What would you like to do?
 
 | Response | Skill |
 |----------|-------|
-| 8, "review PR", "rhdh-pr-review", "test PR", "operator PR", "swap image" | Route to `@rhdh-pr-review` skill |
+| 8, "review PR", "code review", "PR review", "test PR", "operator PR", "review this PR", "rhdh-pr-review" | Route to `@rhdh-pr-review` skill |
 
 **To route:** Read `../rhdh-pr-review/SKILL.md` and follow its intake process.
 
@@ -323,7 +323,7 @@ Todos must be **self-contained**—a new session should understand the task with
 | overlay | Manage plugins in rhdh-plugin-export-overlays | `../overlay/SKILL.md` |
 | create-plugin | Create, export, package, and wire RHDH dynamic plugins | `../create-plugin/SKILL.md` |
 | rhdh-local | Enable/disable/test plugins in local RHDH | `../rhdh-local/SKILL.md` |
-| rhdh-pr-review | Test PR changes on live RHDH cluster | `../rhdh-pr-review/SKILL.md` |
+| rhdh-pr-review | PR code review and live cluster testing | `../rhdh-pr-review/SKILL.md` |
 | rhdh-test-plan-review | Reviews an RHDH test plan Jira ticket and suggests platform/integration version updates | `../rhdh-test-plan-review/SKILL.md` |
 
 ### Shared References

@@ -61,7 +61,7 @@ Track work across the four RHDH Jira projects.
 
 ### PR Review
 
-- **[rhdh-pr-review](./skills/rhdh-pr-review/SKILL.md)** — Test PR changes on a live RHDH cluster. Swaps CI images, verifies code changes, and reports findings.
+- **[rhdh-pr-review](./skills/rhdh-pr-review/SKILL.md)** — PR code review with inline comments (GitHub, GitLab planned) and live cluster testing for rhdh-operator PRs. Layered architecture: fetch → analyze → post.
 
 ### Test Plan
 
