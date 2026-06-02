@@ -56,6 +56,12 @@ def _fetch_lifecycle_json(script_name):
     return None
 
 
+def _first_versions(api_data):
+    """Extract versions list from the first entry of API response data."""
+    data = api_data.get("data", [])
+    return data[0].get("versions", []) if data else []
+
+
 def _fetch_api(product_name):
     """Fetch lifecycle data directly from the Red Hat API (fallback)."""
     url = f"{LIFECYCLE_API_URL}?name={urllib.parse.quote_plus(product_name)}"
@@ -81,8 +87,7 @@ def _get_rhdh_lifecycle():
     api_data = _fetch_api("Red Hat Developer Hub")
     if not api_data:
         return []
-    data = api_data.get("data", [])
-    versions_raw = data[0].get("versions", []) if data else []
+    versions_raw = _first_versions(api_data)
     results = []
     for ver in versions_raw:
         ocp_compat = ver.get("openshift_compatibility", "")
@@ -119,8 +124,7 @@ def _get_ocp_lifecycle(today):
     def _to_date(val):
         return val[:10] if _is_date(val) else None
 
-    data = api_data.get("data", [])
-    versions = data[0].get("versions", []) if data else []
+    versions = _first_versions(api_data)
     versions = [v for v in versions if re.match(r"^\d+\.\d+$", v.get("name", ""))]
     versions = [v for v in versions if int(v["name"].split(".")[0]) >= 4]
 
@@ -153,7 +157,7 @@ def _get_ocp_lifecycle(today):
                     if end and end >= today:
                         current_phase = pname
                         break
-                    elif not _is_date(end_raw) and end_raw not in ("N/A", "", None):
+                    elif end is None or (not _is_date(end_raw) and end_raw not in ("N/A", "")):
                         current_phase = pname
                         break
             if current_phase != "End of life":

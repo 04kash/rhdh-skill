@@ -11,7 +11,7 @@ Read `../references/release-branch-config.md` for file paths and templates.
 
 2. **Verify files to be removed** (show the user and ask for confirmation):
    - **CI config**: `ci-operator/config/redhat-developer/rhdh/redhat-developer-rhdh-release-{version}.yaml`
-   - **Generated jobs**: `ci-operator/jobs/redhat-developer/rhdh/redhat-developer-rhdh-release-{version}-*.yaml`
+   - **Generated jobs** (removed by `make update`): `ci-operator/jobs/redhat-developer/rhdh/redhat-developer-rhdh-release-{version}-*.yaml`
    - **Branch protection**: `release-{version}:` block in `core-services/prow/02_config/redhat-developer/rhdh/_prowconfig.yaml`
 
 3. **Delete the CI config file**
