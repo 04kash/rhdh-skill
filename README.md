@@ -94,6 +94,10 @@ Track work across the four RHDH Jira projects.
 
 - **[rhdh](./skills/rhdh/SKILL.md)** — Entry point and router. Detects your environment, runs `doctor` checks, maintains a cross-session worklog, and routes to the right skill. Start here if you're not sure what you need.
 
+### Repository Readiness
+
+- **[agent-ready](./skills/agent-ready/SKILL.md)** — Assess RHDH repositories against agentready criteria and address each gap. RHDH-aware: detects the repo from its remote URL, uses `rhdh-repos.md` context to pre-fill `AGENTS.md` and skip inapplicable findings. Supports single-repo and batch modes (assess all RHDH repos in one pass).
+
 ### Meta
 
 - **[skill-maker](./skills/skill-maker/SKILL.md)** — Create new skills or consolidate existing ones following the [Agent Skills open standard](https://agentskills.io/specification). Interviews you about scope and edge cases before drafting.
