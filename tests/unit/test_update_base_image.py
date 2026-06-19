@@ -123,10 +123,7 @@ class TestAnalyzeBaseImagesScript:
     def _setup_mock_glit(scripts_dir: Path, output: str) -> None:
         glit = scripts_dir / "getLatestImageTags.sh"
         glit.write_text(
-            "#!/usr/bin/env bash\n"
-            "cat <<'EOF'\n"
-            f"{output.rstrip()}\n"
-            "EOF\n",
+            f"#!/usr/bin/env bash\ncat <<'EOF'\n{output.rstrip()}\nEOF\n",
         )
         glit.chmod(0o755)
 
