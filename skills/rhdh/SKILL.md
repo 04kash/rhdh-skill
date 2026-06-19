@@ -128,6 +128,11 @@ What would you like to do?
 *For RHDH release tracking, status, announcements*
 
 10. **Release management** — Release dates, status, team breakdown, freeze announcements, blocker bugs, CVEs, release notes
+### Software Template Tasks
+
+*For authoring RHDH Scaffolder / Software Templates*
+
+10. **Template authoring** — Templatize codebases, create templates, fix gotchas
 
 ### General Tasks
 
@@ -193,6 +198,13 @@ What would you like to do?
 | 10, "release", "release manager", "release dates", "release status", "feature freeze", "code freeze", "blocker bugs", "CVEs", "release notes", "team breakdown", "freeze announcement" | Route to `@rhdh-release` skill |
 
 **To route:** Read `../rhdh-release/SKILL.md` and follow its intake process.
+### Software Template Routes
+
+| Response | Skill |
+|----------|-------|
+| 10, "template", "software template", "templatize", "scaffolder", "template.yaml", "location.yaml", "golden path", "rhdh-templates" | Route to `@rhdh-templates` skill |
+
+**To route:** Read `../rhdh-templates/SKILL.md` and follow its intake process.
 
 ### Backstage Upgrade Routes
 
@@ -348,6 +360,7 @@ Todos must be **self-contained**—a new session should understand the task with
 | rhdh-pr-review | PR code review and live cluster testing | `../rhdh-pr-review/SKILL.md` |
 | rhdh-test-plan-review | Reviews an RHDH test plan Jira ticket and suggests platform/integration version updates | `../rhdh-test-plan-review/SKILL.md` |
 | rhdh-release | Release dates, status tracking, team coordination, freeze announcements, blocker bugs, CVEs, release notes | `../rhdh-release/SKILL.md` |
+| rhdh-templates | Author RHDH Software Templates (Scaffolder) | `../rhdh-templates/SKILL.md` |
 
 ### Shared References
 

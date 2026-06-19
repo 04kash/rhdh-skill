@@ -1,0 +1,14 @@
+{
+  "name": "{{ values.componentId }}",
+  "version": "0.1.0",
+  "private": true,
+  "description": "{{ values.description }}",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">={{ values.nodeVersion }}.0.0"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test"
+  }
+}

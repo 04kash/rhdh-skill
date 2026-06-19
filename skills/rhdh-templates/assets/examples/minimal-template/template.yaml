@@ -1,0 +1,54 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: minimal-example
+  title: Minimal Example Template
+  description: Starter template scaffolded by rhdh-templates init
+  tags:
+    - example
+spec:
+  owner: group:default/platform-team
+  type: service
+
+  parameters:
+    - title: Component details
+      required:
+        - componentId
+        - owner
+      properties:
+        componentId:
+          title: Component ID
+          type: string
+          pattern: '^[a-z0-9-]*[a-z0-9]$'
+          description: Unique ID for the new component
+          ui:help: Lowercase letters, digits, and dashes only
+          ui:autofocus: true
+        description:
+          title: Description
+          type: string
+          description: What this component does
+        owner:
+          title: Owner
+          type: string
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              kind:
+                - Group
+                - User
+
+  steps:
+    - id: fetch-base
+      name: Fetch skeleton
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          componentId: ${{ parameters.componentId }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+
+  output:
+    links:
+      - title: Template output
+        url: https://backstage.io/docs/features/software-templates/

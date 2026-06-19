@@ -1,0 +1,93 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: nodejs-backend
+  title: Node.js Backend Service
+  description: Scaffold a Node.js REST API with catalog registration and GitHub publish
+  tags:
+    - recommended
+    - nodejs
+    - backend
+spec:
+  owner: group:default/platform-team
+  type: service
+
+  parameters:
+    - title: Component details
+      required:
+        - componentId
+        - owner
+        - description
+      properties:
+        componentId:
+          title: Component ID
+          type: string
+          description: Unique ID for the new component
+          pattern: '^[a-z0-9-]*[a-z0-9]$'
+          ui:autofocus: true
+        description:
+          title: Description
+          type: string
+          description: What this service does
+        owner:
+          title: Owner
+          type: string
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              kind:
+                - Group
+                - User
+        nodeVersion:
+          title: Node.js version
+          type: string
+          enum:
+            - "20"
+            - "22"
+          default: "20"
+    - title: Repository location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+  steps:
+    - id: fetch-base
+      name: Fetch skeleton
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          componentId: ${{ parameters.componentId }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          nodeVersion: ${{ parameters.nodeVersion }}
+
+    - id: publish
+      name: Publish to GitHub
+      action: publish:github
+      input:
+        repoUrl: ${{ parameters.repoUrl }}
+        description: ${{ parameters.description }}
+        defaultBranch: main
+
+    - id: register
+      name: Register in catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
+  output:
+    links:
+      - title: Open repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: View in catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}

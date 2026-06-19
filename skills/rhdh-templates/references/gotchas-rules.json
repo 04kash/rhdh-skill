@@ -1,0 +1,88 @@
+{
+  "rules": [
+    {
+      "id": "api-version",
+      "severity": "critical",
+      "description": "template.yaml must use scaffolder.backstage.io/v1beta3",
+      "check": "api_version",
+      "fix": "set_api_version_v1beta3"
+    },
+    {
+      "id": "action-pascal-case",
+      "severity": "critical",
+      "description": "Scaffolder action IDs use camelCase after the colon (e.g., publish:github not publish:GitHub)",
+      "check": "action_pascal_case",
+      "fix": "lowercase_action_segment"
+    },
+    {
+      "id": "v1beta2-expressions",
+      "severity": "critical",
+      "description": "v1beta3 templates must use ${{ }} not bare {{ parameters. }}",
+      "check": "v1beta2_expression_syntax",
+      "fix": "convert_to_v1beta3_expressions"
+    },
+    {
+      "id": "hardcoded-token",
+      "severity": "critical",
+      "description": "Step inputs should not contain obvious hardcoded tokens or API keys",
+      "check": "hardcoded_secret",
+      "fix": null
+    },
+    {
+      "id": "missing-parameters-section",
+      "severity": "warning",
+      "description": "Production templates should define spec.parameters",
+      "check": "missing_parameters",
+      "fix": null
+    },
+    {
+      "id": "missing-steps-section",
+      "severity": "warning",
+      "description": "Templates should define at least one spec.steps entry",
+      "check": "missing_steps",
+      "fix": null
+    },
+    {
+      "id": "fetch-template-values",
+      "severity": "warning",
+      "description": "fetch:template steps should pass a values map when skeleton uses placeholders",
+      "check": "fetch_template_values",
+      "fix": null
+    },
+    {
+      "id": "workflow-raw-blocks",
+      "severity": "warning",
+      "description": "GitHub workflow files in skeleton with {{ should use {% raw %} or copyWithoutTemplating",
+      "check": "workflow_raw_blocks",
+      "fix": null
+    },
+    {
+      "id": "skeleton-parameters-ref",
+      "severity": "info",
+      "description": "Skeleton files should reference values.* not parameters.*",
+      "check": "skeleton_parameters_ref",
+      "fix": null
+    },
+    {
+      "id": "metadata-tags",
+      "severity": "warning",
+      "description": "metadata.tags improves template discoverability in the Create UI (best-practices tip 8)",
+      "check": "metadata_tags",
+      "fix": null
+    },
+    {
+      "id": "sensitive-param-secret-field",
+      "severity": "warning",
+      "description": "Sensitive parameters (password, token, secret) should use ui:field: Secret (best-practices tip 7)",
+      "check": "sensitive_param_secret_field",
+      "fix": null
+    },
+    {
+      "id": "template-docs",
+      "severity": "info",
+      "description": "Non-trivial templates should include README.md or TechDocs annotation (best-practices tip 9)",
+      "check": "template_docs",
+      "fix": null
+    }
+  ]
+}

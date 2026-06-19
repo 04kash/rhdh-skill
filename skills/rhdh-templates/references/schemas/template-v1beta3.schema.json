@@ -1,0 +1,156 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://rhdh-skill.local/schemas/template-v1beta3.schema.json",
+  "title": "Backstage Software Template v1beta3",
+  "description": "Standalone subset of backstage/backstage Template.v1beta3.schema.json for local validation (no external $ref).",
+  "type": "object",
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "additionalProperties": true,
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "enum": ["scaffolder.backstage.io/v1beta3"]
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["Template"]
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "title": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "spec": {
+      "type": "object",
+      "required": ["type", "steps"],
+      "properties": {
+        "owner": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "minLength": 1 },
+        "lifecycle": { "type": "string", "minLength": 1 },
+        "parameters": {
+          "oneOf": [
+            { "$ref": "#/definitions/parameterForm" },
+            {
+              "type": "array",
+              "items": { "$ref": "#/definitions/parameterForm" }
+            }
+          ]
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/templateStep" }
+        },
+        "output": {
+          "type": "object",
+          "properties": {
+            "links": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/outputLink" }
+            },
+            "text": {
+              "type": "array",
+              "items": { "type": "object" }
+            }
+          },
+          "additionalProperties": { "type": "string" }
+        },
+        "secrets": {
+          "type": "object",
+          "properties": {
+            "schema": { "type": "object" }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "definitions": {
+    "parameterForm": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "required": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/jsonSchemaProperty" }
+        },
+        "dependencies": { "type": "object" },
+        "oneOf": { "type": "array" },
+        "allOf": { "type": "array" }
+      },
+      "additionalProperties": true
+    },
+    "jsonSchemaProperty": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "integer", "boolean", "array", "object", "null"]
+        },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "enum": { "type": "array" },
+        "items": { "type": "object" },
+        "properties": { "type": "object" },
+        "ui:field": { "type": "string" },
+        "ui:widget": { "type": "string" },
+        "ui:options": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "templateStep": {
+      "type": "object",
+      "required": ["action"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "action": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9-]*:[a-z][a-zA-Z0-9]*$"
+        },
+        "input": { "type": "object" },
+        "if": {
+          "oneOf": [{ "type": "string" }, { "type": "boolean" }]
+        }
+      },
+      "additionalProperties": true
+    },
+    "outputLink": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "url": { "type": "string" },
+        "entityRef": { "type": "string" },
+        "icon": { "type": "string" },
+        "if": {
+          "oneOf": [{ "type": "string" }, { "type": "boolean" }]
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

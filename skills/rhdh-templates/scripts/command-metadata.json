@@ -1,0 +1,54 @@
+{
+  "init": {
+    "description": "Check required tooling, scaffold a recommended template-authoring layout, and optionally verify RHDH connectivity.",
+    "argumentHint": "[--rhdh-url URL] [--path DIR]"
+  },
+  "templatize": {
+    "description": "Convert an existing codebase into a parameterized Software Template via interactive analyze → review → scaffold → template.yaml → location.yaml flow.",
+    "argumentHint": "[source directory or repo path]"
+  },
+  "create": {
+    "description": "Guide from-scratch Software Template creation when no reference codebase exists.",
+    "argumentHint": "[template name or description]"
+  },
+  "add-parameter": {
+    "description": "Add a parameter (or parameter group) to an existing template.yaml with RHDH form conventions.",
+    "argumentHint": "[parameter name or description]"
+  },
+  "add-step": {
+    "description": "Add a scaffolder step to an existing template.yaml with correct action IDs and input wiring.",
+    "argumentHint": "[step description or action name]"
+  },
+  "add-skeleton": {
+    "description": "Add or extend skeleton files for an existing template, including Nunjucks parameterization.",
+    "argumentHint": "[file path or skeleton description]"
+  },
+  "create-location": {
+    "description": "Generate or update location.yaml that registers all template.yaml files under templates/.",
+    "argumentHint": "[--path DIR] [--name NAME]"
+  },
+  "fix-gotchas": {
+    "description": "Apply common RHDH template corrections (action casing, secrets syntax, raw/endraw, apiVersion) using packaged rules.",
+    "argumentHint": "[template directory or template.yaml path]"
+  },
+  "validate": {
+    "description": "Local template validation — YAML structure, JSON Schema checks, gotcha rules, optional location.yaml and djLint skeleton lint (--lint-skeleton). No RHDH instance required.",
+    "argumentHint": "[--path DIR] [--repo] [--lint-skeleton] [--no-json-schema]"
+  },
+  "list-actions": {
+    "description": "List Scaffolder actions from a running RHDH instance via GET /api/scaffolder/v2/actions.",
+    "argumentHint": "[--rhdh-url URL] [--filter substring]"
+  },
+  "dry-run": {
+    "description": "Execute template dry-run against RHDH Scaffolder v2 API without creating real resources.",
+    "argumentHint": "[--rhdh-url URL] [--path template-dir] [--values values.json]"
+  },
+  "explain-action": {
+    "description": "Show input/output JSON Schema for a Scaffolder action or parameter schema for a catalog Template.",
+    "argumentHint": "[--action id | --template-ref template:ns/name] [--rhdh-url URL]"
+  },
+  "examples": {
+    "description": "Browse curated reference Software Templates from the official library, AI quickstarts, and bundled skill examples.",
+    "argumentHint": "[--match \"intent\" | --category NAME | --stack NAME | --recommended]"
+  }
+}
