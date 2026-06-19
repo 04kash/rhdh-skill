@@ -144,7 +144,9 @@ class TestAnalyzeScript:
         )
         wf_dir = tmp_path / ".github" / "workflows"
         wf_dir.mkdir(parents=True)
-        (wf_dir / "ci.yaml").write_text("jobs:\n  build:\n    steps:\n      - run: echo ${{ github.ref }}\n")
+        (wf_dir / "ci.yaml").write_text(
+            "jobs:\n  build:\n    steps:\n      - run: echo ${{ github.ref }}\n"
+        )
 
         result = run_script("analyze.py", "--path", str(tmp_path), "--json")
         assert result.returncode == 0
@@ -421,9 +423,7 @@ class TestValidateScript:
         template_dir = tmp_path / "templates" / "demo"
         template_dir.mkdir(parents=True)
         (template_dir / "template.yaml").write_text(
-            (BUNDLED_EXAMPLES / "minimal-template" / "template.yaml").read_text(
-                encoding="utf-8"
-            ),
+            (BUNDLED_EXAMPLES / "minimal-template" / "template.yaml").read_text(encoding="utf-8"),
             encoding="utf-8",
         )
         result = run_script("validate.py", "--path", str(template_dir), "--repo", "--json")

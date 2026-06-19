@@ -312,7 +312,9 @@ def apply_fixes(content: str, rules: list[dict]) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Check and fix RHDH template gotchas.")
-    parser.add_argument("--path", required=True, type=Path, help="template.yaml or template directory")
+    parser.add_argument(
+        "--path", required=True, type=Path, help="template.yaml or template directory"
+    )
     parser.add_argument("--apply", action="store_true", help="Apply automatic fixes")
     parser.add_argument("--json", action="store_true", help="Emit JSON result")
     args = parser.parse_args()

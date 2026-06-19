@@ -21,9 +21,7 @@ STEP_OUTPUT_EXPR = re.compile(
 STEP_REF_BRACKET = re.compile(r"steps\[['\"]([^'\"]+)['\"]\]")
 STEP_REF_DOT = re.compile(r"steps\.([a-zA-Z0-9_-]+)\.output")
 
-VALID_PARAM_TYPES = frozenset(
-    {"string", "number", "integer", "boolean", "array", "object", "null"}
-)
+VALID_PARAM_TYPES = frozenset({"string", "number", "integer", "boolean", "array", "object", "null"})
 RESERVED_PARAM_KEYS = frozenset(
     {
         "properties",
@@ -262,9 +260,7 @@ def validate_parameter_forms(parameters: Any) -> list[dict]:
         for name, prop in props.items():
             if name in RESERVED_PARAM_KEYS:
                 continue
-            findings.extend(
-                validate_parameter_property(name, prop, f"{base}.properties.{name}")
-            )
+            findings.extend(validate_parameter_property(name, prop, f"{base}.properties.{name}"))
 
     return findings
 

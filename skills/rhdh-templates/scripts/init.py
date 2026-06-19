@@ -68,7 +68,12 @@ def probe_rhdh(url: str, timeout: int = 10) -> dict:
             data = json.loads(body) if body else []
             count = len(data) if isinstance(data, list) else 0
             return {"reachable": True, "endpoint": endpoint, "action_count": count}
-    except (urllib.error.URLError, urllib.error.HTTPError, json.JSONDecodeError, TimeoutError) as exc:
+    except (
+        urllib.error.URLError,
+        urllib.error.HTTPError,
+        json.JSONDecodeError,
+        TimeoutError,
+    ) as exc:
         return {"reachable": False, "endpoint": endpoint, "error": str(exc)}
 
 

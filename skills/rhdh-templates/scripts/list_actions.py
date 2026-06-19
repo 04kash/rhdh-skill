@@ -29,7 +29,9 @@ _is_tty = sys.stderr.isatty() and not _no_color
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="List Scaffolder actions from RHDH.")
-    parser.add_argument("--rhdh-url", required=True, help="RHDH base URL (e.g. https://rhdh.example.com)")
+    parser.add_argument(
+        "--rhdh-url", required=True, help="RHDH base URL (e.g. https://rhdh.example.com)"
+    )
     parser.add_argument("--token", help="Bearer token (default: RHDH_TOKEN or BACKSTAGE_TOKEN env)")
     parser.add_argument("--filter", help="Case-insensitive substring filter on action id")
     parser.add_argument("--json", action="store_true", help="Emit JSON result")

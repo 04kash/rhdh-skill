@@ -85,9 +85,7 @@ def filter_examples(
         examples = [e for e in examples if tag in e.get("tags", [])]
     if stack:
         examples = [
-            e
-            for e in examples
-            if stack in e.get("stack", []) or stack in e.get("tags", [])
+            e for e in examples if stack in e.get("stack", []) or stack in e.get("tags", [])
         ]
     if recommended:
         examples = [e for e in examples if e.get("recommended")]

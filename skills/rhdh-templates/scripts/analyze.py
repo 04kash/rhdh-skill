@@ -170,7 +170,9 @@ def extract_from_package_json(path: Path, rel: str, candidates: dict[str, dict])
     except json.JSONDecodeError:
         return
     if isinstance(data.get("name"), str):
-        _add_candidate(candidates, data["name"], category="name", source=rel, usually_parameterize="yes")
+        _add_candidate(
+            candidates, data["name"], category="name", source=rel, usually_parameterize="yes"
+        )
     if isinstance(data.get("description"), str) and len(data["description"]) < 120:
         _add_candidate(
             candidates,
@@ -186,9 +188,13 @@ def extract_from_catalog_info(path: Path, rel: str, candidates: dict[str, dict])
     if not text:
         return
     for match in re.finditer(r"^\s*name:\s*['\"]?([\w.-]+)['\"]?\s*$", text, re.MULTILINE):
-        _add_candidate(candidates, match.group(1), category="name", source=rel, usually_parameterize="yes")
+        _add_candidate(
+            candidates, match.group(1), category="name", source=rel, usually_parameterize="yes"
+        )
     for match in re.finditer(r"^\s*owner:\s*['\"]?([\w:./-]+)['\"]?\s*$", text, re.MULTILINE):
-        _add_candidate(candidates, match.group(1), category="owner", source=rel, usually_parameterize="yes")
+        _add_candidate(
+            candidates, match.group(1), category="owner", source=rel, usually_parameterize="yes"
+        )
 
 
 def extract_from_pom(path: Path, rel: str, candidates: dict[str, dict]) -> None:
@@ -199,7 +205,9 @@ def extract_from_pom(path: Path, rel: str, candidates: dict[str, dict]) -> None:
         for match in re.finditer(rf"<{tag}>([^<]+)</{tag}>", text):
             cat = "name" if tag != "groupId" else "org"
             usually = "yes" if tag in {"artifactId", "name"} else "often"
-            _add_candidate(candidates, match.group(1), category=cat, source=rel, usually_parameterize=usually)
+            _add_candidate(
+                candidates, match.group(1), category=cat, source=rel, usually_parameterize=usually
+            )
 
 
 def extract_urls(text: str, rel: str, candidates: dict[str, dict]) -> None:
@@ -232,7 +240,13 @@ def scan_candidates(root: Path) -> list[dict]:
             continue
         extract_urls(text, rel, candidates)
         for match in K8S_NAME.finditer(text):
-            _add_candidate(candidates, match.group(1), category="name", source=rel, usually_parameterize="often")
+            _add_candidate(
+                candidates,
+                match.group(1),
+                category="name",
+                source=rel,
+                usually_parameterize="often",
+            )
         for match in K8S_NAMESPACE.finditer(text):
             _add_candidate(
                 candidates,

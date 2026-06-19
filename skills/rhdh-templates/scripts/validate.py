@@ -212,11 +212,15 @@ def run_djlint(skeleton_dir: Path) -> list[dict]:
     return findings
 
 
-def validate_template(path: Path, *, check_repo: bool, lint_skeleton: bool, use_jsonschema: bool = True) -> dict:
+def validate_template(
+    path: Path, *, check_repo: bool, lint_skeleton: bool, use_jsonschema: bool = True
+) -> dict:
     template_path = resolve_template_path(path)
     content = template_path.read_text(encoding="utf-8")
     template_dir = template_path.parent
-    repo_root = template_dir.parent.parent if template_dir.parent.name == "templates" else template_dir
+    repo_root = (
+        template_dir.parent.parent if template_dir.parent.name == "templates" else template_dir
+    )
 
     findings: list[dict] = []
 
@@ -278,7 +282,9 @@ def validate_template(path: Path, *, check_repo: bool, lint_skeleton: bool, use_
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate RHDH Software Template locally.")
-    parser.add_argument("--path", required=True, type=Path, help="template.yaml or template directory")
+    parser.add_argument(
+        "--path", required=True, type=Path, help="template.yaml or template directory"
+    )
     parser.add_argument(
         "--repo",
         action="store_true",
