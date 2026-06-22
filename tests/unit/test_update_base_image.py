@@ -40,9 +40,9 @@ class TestAnalyzeBaseImagesScript:
         assert ANALYZE_SCRIPT.is_file()
 
     @pytest.mark.parametrize("flag", ["--help", "-h"])
-    def test_help_prints_usage_and_exits_nonzero(self, flag: str) -> None:
+    def test_help_prints_usage_and_exits_zero(self, flag: str) -> None:
         result = _run_script(flag)
-        assert result.returncode != 0
+        assert result.returncode == 0
         assert "Usage:" in result.stdout + result.stderr
 
     def test_unknown_option_exits_nonzero(self) -> None:
@@ -118,3 +118,94 @@ class TestAnalyzeBaseImagesScript:
         )
         assert result.returncode != 0
         assert "No Containerfiles or Dockerfiles found" in result.stdout + result.stderr
+
+    @staticmethod
+    def _setup_mock_glit(scripts_dir: Path, output: str) -> None:
+        glit = scripts_dir / "getLatestImageTags.sh"
+        glit.write_text(
+            f"#!/usr/bin/env bash\ncat <<'EOF'\n{output.rstrip()}\nEOF\n",
+        )
+        glit.chmod(0o755)
+
+    @staticmethod
+    def _write_containerfile(repo_dir: Path, tag: str) -> Path:
+        cf = repo_dir / "Containerfile"
+        cf.write_text(
+            "# https://registry.access.redhat.com/ubi9/nodejs-24\n"
+            f"FROM registry.access.redhat.com/ubi9/nodejs-24:{tag}@sha256:abc AS skeleton\n"
+        )
+        return cf
+
+    @pytest.mark.skipif(shutil.which("skopeo") is None, reason="skopeo not installed")
+    def test_well_formed_latest_tag_selected(self, tmp_path: Path) -> None:
+        scripts_dir = tmp_path / "scripts"
+        scripts_dir.mkdir()
+        self._setup_mock_glit(
+            scripts_dir,
+            "registry.access.redhat.com/ubi9/nodejs-24:1780432632\n"
+            "registry.access.redhat.com/ubi9/nodejs-24:9.8-1780434037",
+        )
+        repo_dir = tmp_path / "repo"
+        repo_dir.mkdir()
+        self._write_containerfile(repo_dir, "9.8-1780430000")
+
+        result = _run_script(
+            "-s",
+            str(scripts_dir),
+            "-w",
+            str(repo_dir),
+            str(repo_dir / "Containerfile"),
+            env=_clean_rhdh_env(),
+        )
+        assert result.returncode == 0
+        assert "latest:  9.8-1780434037" in result.stdout
+        assert "UPDATE AVAILABLE" in result.stdout
+
+    @pytest.mark.skipif(shutil.which("skopeo") is None, reason="skopeo not installed")
+    def test_bare_numeric_current_tag_warns_and_skips(self, tmp_path: Path) -> None:
+        scripts_dir = tmp_path / "scripts"
+        scripts_dir.mkdir()
+        self._setup_mock_glit(
+            scripts_dir,
+            "registry.access.redhat.com/ubi9/nodejs-24:9.8-1780434037",
+        )
+        repo_dir = tmp_path / "repo"
+        repo_dir.mkdir()
+        self._write_containerfile(repo_dir, "1780432632")
+
+        result = _run_script(
+            "-s",
+            str(scripts_dir),
+            "-w",
+            str(repo_dir),
+            str(repo_dir / "Containerfile"),
+            env=_clean_rhdh_env(),
+        )
+        assert result.returncode == 0
+        assert "warning: current tag is not well-formed" in result.stdout
+        assert "SKIPPED (malformed current tag" in result.stdout
+
+    @pytest.mark.skipif(shutil.which("skopeo") is None, reason="skopeo not installed")
+    def test_no_well_formed_latest_skips_update(self, tmp_path: Path) -> None:
+        scripts_dir = tmp_path / "scripts"
+        scripts_dir.mkdir()
+        self._setup_mock_glit(
+            scripts_dir,
+            "registry.access.redhat.com/ubi9/nodejs-24:1780432632\n"
+            "registry.access.redhat.com/ubi9/nodejs-24:1780439999",
+        )
+        repo_dir = tmp_path / "repo"
+        repo_dir.mkdir()
+        self._write_containerfile(repo_dir, "9.8-1780430000")
+
+        result = _run_script(
+            "-s",
+            str(scripts_dir),
+            "-w",
+            str(repo_dir),
+            str(repo_dir / "Containerfile"),
+            env=_clean_rhdh_env(),
+        )
+        assert result.returncode == 0
+        assert "no well-formed x.y-z or x.y.z-z tag" in result.stdout
+        assert "SKIPPED (no well-formed tag" in result.stdout

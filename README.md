@@ -55,7 +55,7 @@ Manage Prow CI job configurations and trigger nightly E2E tests.
 
 Bump UBI / RHEC base image tags and refresh `@sha256` digests in **rhdh** and **rhdh-operator** (see [rhdh-repos](./skills/rhdh/references/rhdh-repos.md)).
 
-- **[update-base-image](./skills/update-base-image/SKILL.md)** — Analyze and update Containerfile / Dockerfile using [rhdh-downstream](./skills/rhdh/references/rhdh-repos.md#rhdh-downstream) scripts (`build/scripts/`). Bundled `analyze-base-images.sh`; run `updateBaseImages.sh` per repo. Requires `skopeo login registry.redhat.io`.
+- **[update-base-image](./skills/update-base-image/SKILL.md)** — Analyze and update Containerfile / Dockerfile using [rhdh-downstream](./skills/rhdh/references/rhdh-repos.md#rhdh-downstream) scripts (`build/scripts/`). Tags must be `major.minor-buildid` or `x.y.z-buildid`; bare numeric registry tags are ignored. Bundled `analyze-base-images.sh`; run `updateBaseImages.sh` per repo. Requires `skopeo login registry.redhat.io`.
 
 ```bash
 npx skills add redhat-developer/rhdh-skill --skill update-base-image

@@ -9,18 +9,19 @@ FILES=()
 FIND_NAMES=(Containerfile Dockerfile)
 
 usage() {
+	local code="${1:-1}"
 	echo "Usage: $0 [-s SCRIPTS_DIR] [-w WORKDIR]... [file ...]"
 	echo "  -s  Directory with getLatestImageTags.sh (default: \$RHDH_BUILD_SCRIPTS)"
 	echo "  -w  Repo root to scan (repeatable). Default: \$RHDH_REPO and \$RHDH_OPERATOR_REPO."
 	echo "  With no file args, scans Containerfile and Dockerfile under each -w (maxdepth 5)."
-	exit 1
+	exit "$code"
 }
 
 while [[ $# -gt 0 ]]; do
 	case "$1" in
 		-s) RHDH_BUILD_SCRIPTS="${2%/}"; shift 2 ;;
 		-w) WORKDIRS+=("${2%/}"); shift 2 ;;
-		-h|--help) usage ;;
+		-h|--help) usage 0 ;;
 		-*) echo "Unknown option: $1" >&2; usage ;;
 		*) FILES+=("$1"); shift ;;
 	esac
@@ -96,6 +97,30 @@ command -v skopeo >/dev/null 2>&1 || { echo "skopeo required" >&2; exit 1; }
 
 GLIT="${RHDH_BUILD_SCRIPTS}/getLatestImageTags.sh"
 UPDATE="${RHDH_BUILD_SCRIPTS}/updateBaseImages.sh"
+
+# Match updateBaseImages.sh: x.y-timestamp or x.y.z-timestamp (not bare timestamps like 1780432632).
+RHEC_TAG_VERSION_PREFIX='[0-9]+\.[0-9]+(\.[0-9]+)?-'
+
+is_well_formed_rhec_tag() {
+	[[ "$1" =~ ^${RHEC_TAG_VERSION_PREFIX}[0-9]+$ ]]
+}
+
+parse_latest_well_formed_tag() {
+	local raw="$1"
+	local tag
+	tag=$(printf '%s\n' "$raw" | sed -n 's#.*:\([^@[:space:]]*\)$#\1#p' \
+		| grep -E "^${RHEC_TAG_VERSION_PREFIX}[0-9]+" | sort -V | tail -1)
+	printf '%s' "$tag"
+}
+
+resolve_glit_tag() {
+	local comment_url="${1:-}"
+	if [[ -n "$comment_url" ]] && [[ "$comment_url" == *"#"* ]]; then
+		printf '%s' "${comment_url#*#}"
+	else
+		printf '%s' "${RHEC_TAG_VERSION_PREFIX}"
+	fi
+}
 
 if [[ ! -x "$GLIT" ]]; then
 	echo "getLatestImageTags.sh not found at ${GLIT}" >&2
@@ -177,17 +202,31 @@ for cf in "${FILES[@]}"; do
 		echo "  FROM ${image_name}"
 		echo "    comment: ${last_comment:-"(none — add # https://registry.../image above FROM)"}"
 		echo "    current: ${current_tag}"
+		if ! is_well_formed_rhec_tag "$current_tag"; then
+			echo "    warning: current tag is not well-formed x.y-z or x.y.z-z (updateBaseImages.sh will skip)"
+		fi
 
-		latest=$("$GLIT" -q -c "${image_name}" --tag . --latestNext latest 2>/dev/null | sort -V | tail -1 || true)
-		latest_tag="${latest##*:}"
-		latest_tag="${latest_tag%%@*}"
+		glit_tag=$(resolve_glit_tag "$last_comment")
+		latest_raw=$("$GLIT" -q -c "${image_name}" --tag "${glit_tag}" --latestNext latest 2>/dev/null || true)
+		latest_tag=$(parse_latest_well_formed_tag "$latest_raw")
 
-		echo "    latest:  ${latest_tag:-"(query failed — check registry login)"}"
-		if [[ -n "$latest_tag" ]] && [[ "$current_tag" != "$latest_tag" ]] \
+		if [[ -n "$latest_tag" ]]; then
+			echo "    latest:  ${latest_tag}"
+		elif [[ -n "$latest_raw" ]]; then
+			echo "    latest:  (no well-formed x.y-z or x.y.z-z tag; filter: ${glit_tag})"
+		else
+			echo "    latest:  (query failed — check registry login)"
+		fi
+
+		if [[ -z "$latest_tag" ]]; then
+			echo "    status:  SKIPPED (no well-formed tag — update script would skip)"
+		elif ! is_well_formed_rhec_tag "$current_tag"; then
+			echo "    status:  SKIPPED (malformed current tag — fix before update)"
+		elif [[ "$current_tag" != "$latest_tag" ]] \
 			&& [[ "$(printf '%s\n' "${current_tag}" "${latest_tag}" | sort -V | tail -1)" == "${latest_tag}" ]]; then
 			echo "    status:  UPDATE AVAILABLE"
 		else
-			echo "    status:  ok (or could not compare)"
+			echo "    status:  ok"
 		fi
 		echo ""
 		last_comment=""

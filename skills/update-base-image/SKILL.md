@@ -100,7 +100,17 @@ Run **`updateBaseImages.sh` once per repo** from `$RHDH_BUILD_SCRIPTS`:
 | `--pr`                          | Opens one PR with all commits (protected branches)                                                         |
 | `--no-commit`                   | Writes file changes only; no git commit, push, or PR                                                       |
 
-**Tag format:** RHEC tags may use `major.minor-buildid` (e.g. `9.8-1780434037`) or bare numeric build ids (e.g. `1780432632`). Analysis queries all matching registry tags via `getLatestImageTags.sh --tag .` (built-in excludes still apply).
+**Tag format:** RHEC release tags must be `major.minor-buildid` (e.g. `9.8-1780434037`) or `x.y.z-buildid` (e.g. `1.2.3-1234567890`). Bare numeric build ids (e.g. `1780432632`) are **ignored** — `updateBaseImages.sh` skips those `FROM` lines with a warning. Default tag filter: `[0-9]+\.[0-9]+(\.[0-9]+)?-` (same as upstream). Override with `--tag` on the update script, or append `#regex` to the comment URL above `FROM` (e.g. `# https://registry.../ubi9/nodejs-24#^9\.8-`).
+
+**Optional `updateBaseImages.sh` flags:**
+
+| Flag                          | Purpose                                                                                                             |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `-sb` / `--scripts-branch`    | Branch for helper scripts (default: midstream branch); distinct from `-b` / `--sources-branch` (repo being updated) |
+| `--no-sha`                    | Write tag only; omit `@sha256` digest suffix                                                                        |
+| `-p` / `--no-push`            | Commit locally but do not push                                                                                      |
+| `--check-recent-updates-only` | Report recently changed Dockerfiles without polling the registry                                                    |
+| `--tag REGEX`                 | Override default well-formed tag filter for all images                                                              |
 
 ## Analyze without committing
 
@@ -162,6 +172,9 @@ Stage-only lines (`FROM skeleton AS deps`) are ignored.
 | Missing `# https://registry...` comment | Add comment above `FROM`                                                                       |
 | Registry not logged in                  | `skopeo login registry.redhat.io`                                                              |
 | Current tag already newest              | Script skips; confirm with `getLatestImageTags.sh -n 5`                                        |
+| Bare numeric tag (e.g. `1780432632`)    | Not well-formed; rewrite to `x.y-<buildid>` or update script skips the line                    |
+| Analyze vs update disagree on latest    | Both use the same filter; ensure analyze output is not stale and comment `#regex` matches      |
+| `No well-formed x.y-z or x.y.z-z tag`   | Registry returned only bare timestamps; check `--tag` or comment `#filter` on the image URL    |
 
 ## UBI mismatch warnings
 
