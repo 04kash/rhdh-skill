@@ -29,10 +29,14 @@ def _rhdh_url() -> str | None:
 
 
 def _rhdh_reachable(url: str) -> bool:
+    headers = {"Accept": "application/json"}
+    token = os.environ.get("RHDH_TOKEN") or os.environ.get("BACKSTAGE_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
     try:
         req = urllib.request.Request(
             f"{url.rstrip('/')}/api/scaffolder/v2/actions",
-            headers={"Accept": "application/json"},
+            headers=headers,
             method="GET",
         )
         with urllib.request.urlopen(req, timeout=5) as resp:

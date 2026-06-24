@@ -110,10 +110,20 @@ def main() -> int:
                 raise ValueError("--secrets file must contain a JSON object")
             secrets = {str(k): str(v) for k, v in raw.items()}
 
-        skeleton_dir = args.skeleton_dir or (template_dir / "skeleton")
         directory_contents: list[dict[str, str]] = []
-        if skeleton_dir.is_dir():
-            directory_contents = load_directory_contents(skeleton_dir)
+        content_root = args.skeleton_dir or template_dir
+        if content_root.is_dir():
+            if args.skeleton_dir:
+                prefix = content_root.relative_to(template_dir).as_posix()
+                for item in load_directory_contents(content_root):
+                    directory_contents.append(
+                        {
+                            "path": f"{prefix}/{item['path']}",
+                            "base64Content": item["base64Content"],
+                        }
+                    )
+            else:
+                directory_contents = load_directory_contents(content_root)
 
         response = dry_run(
             args.rhdh_url,
