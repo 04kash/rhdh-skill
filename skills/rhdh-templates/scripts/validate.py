@@ -159,32 +159,75 @@ def check_location_yaml(repo_root: Path) -> list[dict]:
     return findings
 
 
-def run_djlint(skeleton_dir: Path) -> list[dict]:
-    import shutil
+# djlint defaults to --extension=html; scaffolder skeletons are mostly non-HTML.
+SKELETON_LINT_SKIP_SUFFIXES = frozenset(
+    {
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".gif",
+        ".webp",
+        ".ico",
+        ".svg",
+        ".pdf",
+        ".zip",
+        ".tar",
+        ".gz",
+        ".bz2",
+        ".xz",
+        ".7z",
+        ".jar",
+        ".war",
+        ".ear",
+        ".class",
+        ".so",
+        ".dll",
+        ".dylib",
+        ".exe",
+        ".bin",
+        ".dat",
+        ".woff",
+        ".woff2",
+        ".ttf",
+        ".eot",
+        ".mp3",
+        ".mp4",
+        ".avi",
+        ".mov",
+        ".wav",
+    }
+)
 
-    if not shutil.which("djlint"):
+
+def collect_skeleton_lint_targets(skeleton_dir: Path) -> tuple[set[str], list[Path]]:
+    """Return (extensions, extensionless files) djlint should lint under skeleton/."""
+    extensions: set[str] = set()
+    extensionless: list[Path] = []
+    for path in skeleton_dir.rglob("*"):
+        if not path.is_file():
+            continue
+        suffix = path.suffix.lower()
+        if suffix in SKELETON_LINT_SKIP_SUFFIXES:
+            continue
+        try:
+            path.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        if suffix:
+            extensions.add(suffix.lstrip("."))
+        else:
+            extensionless.append(path)
+    return extensions, sorted(extensionless)
+
+
+def _parse_djlint_output(proc: subprocess.CompletedProcess) -> list[dict]:
+    combined = f"{proc.stdout}\n{proc.stderr}"
+    if "No files to check" in combined:
         return [
             {
                 "check": "nunjucks_lint",
-                "severity": "info",
-                "message": "djlint not installed — skipping Nunjucks lint",
-            }
-        ]
-    cmd = [
-        "djlint",
-        str(skeleton_dir),
-        "--profile=jinja",
-        "--lint",
-        "--quiet",
-    ]
-    try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
-    except OSError as exc:
-        return [
-            {
-                "check": "nunjucks_lint",
-                "severity": "info",
-                "message": f"djlint skipped: {exc}",
+                "severity": "warning",
+                "message": "djlint found no files to check for this target",
             }
         ]
     if proc.returncode == 0:
@@ -209,6 +252,75 @@ def run_djlint(skeleton_dir: Path) -> list[dict]:
                 "message": proc.stderr.strip() or "djlint reported issues",
             }
         )
+    return findings
+
+
+def _run_djlint_cmd(cmd: list[str]) -> list[dict]:
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    except OSError as exc:
+        return [
+            {
+                "check": "nunjucks_lint",
+                "severity": "info",
+                "message": f"djlint skipped: {exc}",
+            }
+        ]
+    return _parse_djlint_output(proc)
+
+
+def run_djlint(skeleton_dir: Path) -> list[dict]:
+    import shutil
+
+    if not shutil.which("djlint"):
+        return [
+            {
+                "check": "nunjucks_lint",
+                "severity": "info",
+                "message": "djlint not installed — skipping Nunjucks lint",
+            }
+        ]
+
+    extensions, extensionless = collect_skeleton_lint_targets(skeleton_dir)
+    if not extensions and not extensionless:
+        file_count = sum(1 for path in skeleton_dir.rglob("*") if path.is_file())
+        if file_count:
+            return [
+                {
+                    "check": "nunjucks_lint",
+                    "severity": "info",
+                    "message": "No readable text skeleton files to lint",
+                }
+            ]
+        return [
+            {
+                "check": "nunjucks_lint",
+                "severity": "info",
+                "message": "Skeleton directory is empty — nothing to lint",
+            }
+        ]
+
+    findings: list[dict] = []
+    for ext in sorted(extensions):
+        cmd = [
+            "djlint",
+            str(skeleton_dir),
+            "-e",
+            ext,
+            "--profile=jinja",
+            "--lint",
+            "--quiet",
+        ]
+        findings.extend(_run_djlint_cmd(cmd))
+    for path in extensionless:
+        cmd = [
+            "djlint",
+            str(path),
+            "--profile=jinja",
+            "--lint",
+            "--quiet",
+        ]
+        findings.extend(_run_djlint_cmd(cmd))
     return findings
 
 

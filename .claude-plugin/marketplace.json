@@ -5,7 +5,6 @@
   },
   "metadata": {
     "description": "Orchestrator skill for RHDH plugin development - onboard, update, and maintain plugins in the Extensions Catalog",
-
     "version": "0.6.1"
   },
   "plugins": [

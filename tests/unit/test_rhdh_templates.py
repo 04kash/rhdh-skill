@@ -375,6 +375,61 @@ class TestValidateScript:
         assert data["ok"] is True
         assert data["critical_count"] == 0
 
+    def test_collect_skeleton_lint_targets_includes_non_html_extensions(self) -> None:
+        sys.path.insert(0, str(SCRIPTS))
+        import validate
+
+        skeleton = BUNDLED_EXAMPLES / "java-springboot" / "skeleton"
+        extensions, extensionless = validate.collect_skeleton_lint_targets(skeleton)
+        assert {"java", "md", "properties", "xml", "yaml"}.issubset(extensions)
+        assert extensionless == []
+
+    def test_run_djlint_uses_per_extension_targets(self, monkeypatch, tmp_path: Path) -> None:
+        sys.path.insert(0, str(SCRIPTS))
+        import validate
+
+        skeleton = tmp_path / "skeleton"
+        skeleton.mkdir()
+        (skeleton / "App.java").write_text("public class App {}\n", encoding="utf-8")
+        (skeleton / "config.yaml").write_text("name: {{ values.name }}\n", encoding="utf-8")
+
+        calls: list[list[str]] = []
+
+        def fake_run(cmd, **kwargs):
+            calls.append(cmd)
+            return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
+
+        monkeypatch.setattr(subprocess, "run", fake_run)
+        monkeypatch.setattr("shutil.which", lambda _: "/usr/bin/djlint")
+
+        findings = validate.run_djlint(skeleton)
+        assert findings == []
+        assert len(calls) == 2
+        assert all(call[0] == "djlint" for call in calls)
+        assert all("-e" in call for call in calls)
+        used_extensions = {call[call.index("-e") + 1] for call in calls}
+        assert used_extensions == {"java", "yaml"}
+
+    def test_run_djlint_warns_when_djlint_checks_nothing(self, monkeypatch, tmp_path: Path) -> None:
+        sys.path.insert(0, str(SCRIPTS))
+        import validate
+
+        skeleton = tmp_path / "skeleton"
+        skeleton.mkdir()
+        (skeleton / "config.yaml").write_text("name: test\n", encoding="utf-8")
+
+        def fake_run(cmd, **kwargs):
+            return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="No files to check! 😢")
+
+        monkeypatch.setattr(subprocess, "run", fake_run)
+        monkeypatch.setattr("shutil.which", lambda _: "/usr/bin/djlint")
+
+        findings = validate.run_djlint(skeleton)
+        assert any(
+            f["check"] == "nunjucks_lint" and "no files to check" in f["message"].lower()
+            for f in findings
+        )
+
     def test_detects_bad_api_version(self, tmp_path: Path) -> None:
         bad = tmp_path / "template.yaml"
         bad.write_text(
